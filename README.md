@@ -5,7 +5,8 @@ Plans for a Successor of the PrismCNC
 - Acrylic Box
   - With Doors / Hatches
 - Base
-  - Plate
+  - Stainless Steel Plate
+  - [Hexagonal Aluminum Foil](https://www.alibaba.com/product-detail/3003-Aluminum-honeycomb-core-for-honeycomb_1605313553.html)
   - Legs / Feet
 - 3 Axis Linear Guide
   - [Rail](https://www.aliexpress.com/item/6-sets-linear-rail-SBR16-linear-guide-any-length-linear-bearing-blocks-SFU1605-ball-screw-3/32838832050.html)
@@ -19,13 +20,15 @@ Plans for a Successor of the PrismCNC
 - Position Measurement
 - Tool Length Measurement
 - Automatic Tool Changer
+- Tool Holders
+- Collets
 - Coolant Pump & Driver
 - Lamps / Lights
 
 ## Power & Control Hardware
 - Metal Box
 - Plugs & Cables
-- Emergency Shutdown Button
+- [Emergency Stop Button](https://www.aliexpress.com/item/Waterproof-Twist-to-Reset-Emergency-Stop-Station-Push-Button-Switch-600V-10A/32488958413.html)
 - Arduino for Realtime Control
 - Raspery PI or similar
   - Ethernet Port (RJ-45)
