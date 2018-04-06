@@ -31,6 +31,7 @@ Plans for a Successor of the PrismCNC
 ## Power & Control Hardware
 - Metal Box
 - Plugs & Cables
+- [2D Joystick](https://www.aliexpress.com/item/Electric-Joystick-potentiometer-JH-D202X-R2-R4-10K-2D-Monitor-Keyboard-ball-controller-For-Photographic-film/32851202122.html) or [4D Joystick](https://www.aliexpress.com/item/1pc-Plastic-4-Axis-Joystick-Potentiometer-Button-49-6-94-5mm-For-JH-D400X-R4-10K/32857307709.html) for Manual Control
 - [Emergency Stop Button](https://www.aliexpress.com/item/Waterproof-Twist-to-Reset-Emergency-Stop-Station-Push-Button-Switch-600V-10A/32488958413.html)
 - Arduino for Realtime Control
 - Raspery PI or similar
