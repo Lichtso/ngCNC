@@ -4,10 +4,11 @@ Plans for a Successor of the PrismCNC
 ## Machining Hardware
 - Acrylic Box
   - With Doors / Hatches
-- Base
+- Structure
   - Stainless Steel Plates
   - [Hexagonal Aluminum Foil](https://www.alibaba.com/product-detail/3003-Aluminum-honeycomb-core-for-honeycomb_1605313553.html)
   - Legs / Feet
+  - [Aluminum Extrusion Profile](https://www.aliexpress.com/item/Aluminum-Profile-Aluminum-Extrusion-Profile-4040-40-40-commonly-used-in-assembling-device-frame-table-and/32320585430.html)
 - 3 Axis Linear Guide
   - [Rail](https://www.aliexpress.com/item/6-sets-linear-rail-SBR16-linear-guide-any-length-linear-bearing-blocks-SFU1605-ball-screw-3/32838832050.html)
   - [Dust Cover (Bellows)](https://www.aliexpress.com/item/Tri-proof-nylon-cloth-accordion-cnc-machine-dust-cover-bellows-W145mm-x-H35mm-x-extension-300mm/32675025594.html)
