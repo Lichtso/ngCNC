@@ -1,20 +1,31 @@
 # ngCNC
 Plans for a Successor of the PrismCNC
 
-## Machining Hardware
-- Acrylic Box
-  - With Doors / Hatches
-- Structure
+
+
+## Statics
+- Base Plate Composite
   - Stainless Steel Plates
   - [Hexagonal Aluminum Foil](https://www.alibaba.com/product-detail/3003-Aluminum-honeycomb-core-for-honeycomb_1605313553.html)
-  - Legs / Feet
-  - [Aluminum Extrusion Profile](https://www.aliexpress.com/item/Aluminum-Profile-Aluminum-Extrusion-Profile-4040-40-40-commonly-used-in-assembling-device-frame-table-and/32320585430.html)
+- Legs / Feet
+- [Aluminum Extrusion Profile](https://www.aliexpress.com/item/Aluminum-Profile-Aluminum-Extrusion-Profile-4040-40-40-commonly-used-in-assembling-device-frame-table-and/32320585430.html)
+- [Connection Plates](https://www.aliexpress.com/item/European-Standard-Carbon-Steel-T-Type-Connection-Plate-for-4040-Aluminum-Extrusion-Profile-Set-of-2/32842401219.html)
+- [Corners](https://www.aliexpress.com/item/10pcs-4040-Corner-Bracket-Fittings-40-40-Corner-Angle-L-Breakets-Connector-Aluminum-Profile-Accessories/32779895384.html)
+- [Nut Hammer Heads](https://www.aliexpress.com/item/20pcs-10pcs-M4-M5-M6-M8-T-nut-Hammer-Head-Nut-Bolt-for-4545-4040-series/32825313543.html)
+- Acrylic Box
+  - With Doors / Hatches
+- Metal Box for Electronics
+- Lamps / Lights
+
+## Robotics
 - 3 Axis Linear Guide
   - [Rail](https://www.aliexpress.com/item/6-sets-linear-rail-SBR16-linear-guide-any-length-linear-bearing-blocks-SFU1605-ball-screw-3/32838832050.html)
   - [Dust Cover (Bellows)](https://www.aliexpress.com/item/Tri-proof-nylon-cloth-accordion-cnc-machine-dust-cover-bellows-W145mm-x-H35mm-x-extension-300mm/32675025594.html)
   - [Drag Chain](https://www.aliexpress.com/store/product/25-x-103-series-bridge-type-reinforced-type-engineering-nylon-cable-drag-chain-carriers-for-cnc/1202171_32360447975.html)
 - [2 Axis Angular](https://www.aliexpress.com/item/Free-shipping-New-K01-100-Chuck-CNC-4th-axis-5th-axis-A-aixs-rotary-axis-for/2053559551.html)
 - Stepper Motors & Drivers
+
+## Milling
 - Spindle Motor & Driver
   - Speed Control
   - Power Control
@@ -27,10 +38,8 @@ Plans for a Successor of the PrismCNC
 - Coolant
   - [Spray](https://www.aliexpress.com/item/1pc-Mist-Coolant-Lubrication-Spray-System-High-Quality-Mist-Coolant-System-For-8mm-Air-Pipe-CNC/32825718858.html)
   - Pump & Driver
-- Lamps / Lights
 
-## Power & Control Hardware
-- Metal Box
+## Electronics
 - Plugs & Cables
 - [2D Joystick](https://www.aliexpress.com/item/Electric-Joystick-potentiometer-JH-D202X-R2-R4-10K-2D-Monitor-Keyboard-ball-controller-For-Photographic-film/32851202122.html) or [4D Joystick](https://www.aliexpress.com/item/1pc-Plastic-4-Axis-Joystick-Potentiometer-Button-49-6-94-5mm-For-JH-D400X-R4-10K/32857307709.html) for Manual Control
 - [Emergency Stop Button](https://www.aliexpress.com/item/Waterproof-Twist-to-Reset-Emergency-Stop-Station-Push-Button-Switch-600V-10A/32488958413.html)
