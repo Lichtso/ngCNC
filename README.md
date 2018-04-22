@@ -52,8 +52,7 @@ Plans for a Successor of the PrismCNC
   * Ethernet Port (RJ-45)
 * Power Supply
   * [Transformer](https://www.aliexpress.com/item/300W-B-Dual-output-5V-24V-Switching-power-supply-AC-to-DC-25A-DC-7A/1586462604.html)
-  * On / Off Switch
-  * [IEC 60320 (C14)](https://www.aliexpress.com/item/1PC-3-PIN-IEC-320-C14-Male-Power-Cord-Inlet-Socket-Receptacle-Connector-With-Fuse-Holder/32724095665.html)
+  * [IEC 60320 (C14) with Fuse and Switch](https://www.aliexpress.com/item/3-In-1-Fused-Holder-Switch-10A-AC-250V-IEC320-C14-Inlet-Male-Power-Socket-Connector/32854443760.html)
 
 ## Software
 
