@@ -40,6 +40,8 @@ Plans for a Successor of the PrismCNC
 * Coolant
   * [Spray](https://www.aliexpress.com/item/1pc-Mist-Coolant-Lubrication-Spray-System-High-Quality-Mist-Coolant-System-For-8mm-Air-Pipe-CNC/32825718858.html)
   * Pump & Driver
+* [Vise](https://www.aliexpress.com/item/QKG50-2-machine-vise-Used-for-surface-grinding-machine-milling-machine-edm-machine-etc/32340735217.html)
+* [Switchable Magnets](https://www.aliexpress.com/item/LISHUAI-On-Off-Magnetic-Base-Holder-Switchable-Neodymium-Magnet-Indicator-Clamp-30kg-50kg-80kg-100kg/32849950877.html)
 
 ## Electronics
 
