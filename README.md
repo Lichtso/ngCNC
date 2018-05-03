@@ -19,7 +19,7 @@ Plans for a Successor of the PrismCNC
 
 ## Robotics
 
-* 3 Axis Linear Guide
+* 3 Axis Linear Guide (Workspace: 650mm x 400mm x 250mm)
   * [Rail](https://www.aliexpress.com/item/6-sets-linear-rail-SBR16-linear-guide-any-length-linear-bearing-blocks-SFU1605-ball-screw-3/32838832050.html)
   * [Dust Cover (Bellows)](https://www.aliexpress.com/item/Tri-proof-nylon-cloth-accordion-cnc-machine-dust-cover-bellows-W145mm-x-H35mm-x-extension-300mm/32675025594.html)
   * [Drag Chain](https://www.aliexpress.com/store/product/25-x-103-series-bridge-type-reinforced-type-engineering-nylon-cable-drag-chain-carriers-for-cnc/1202171_32360447975.html)
