@@ -6,13 +6,13 @@ Plans for a Successor of the PrismCNC
 
 * Base Plate Composite
   * Stainless Steel Plates
-  * [Hexagonal Aluminum Foil](https://www.alibaba.com/product-detail/3003-Aluminum-honeycomb-core-for-honeycomb_1605313553.html)
+  * [Aluminum Honeycombs with Frame](https://de.aliexpress.com/item/Size-can-be-customized-Honeycomb-Working-Table-300x200mm-Laser-Enquipment-Parts-For-CO2-Laser-Engraver-Cutting/32791623758.html)
 * Legs / Feet
 * [Aluminum Extrusion Profile](https://www.aliexpress.com/item/Aluminum-Profile-Aluminum-Extrusion-Profile-4040-40-40-commonly-used-in-assembling-device-frame-table-and/32320585430.html)
 * [Connection Plates](https://www.aliexpress.com/item/European-Standard-Carbon-Steel-T-Type-Connection-Plate-for-4040-Aluminum-Extrusion-Profile-Set-of-2/32842401219.html)
 * [Corners](https://www.aliexpress.com/item/10pcs-4040-Corner-Bracket-Fittings-40-40-Corner-Angle-L-Breakets-Connector-Aluminum-Profile-Accessories/32779895384.html)
 * [Nut Hammer Heads](https://www.aliexpress.com/item/20pcs-10pcs-M4-M5-M6-M8-T-nut-Hammer-Head-Nut-Bolt-for-4545-4040-series/32825313543.html)
-* Acrylic Box
+* Acrylic / Perspex Box (Fish Tank?)
   * With Doors / Hatches
 * Metal Box for Electronics
 * Lamps / Lights
@@ -28,9 +28,7 @@ Plans for a Successor of the PrismCNC
 
 ## Milling
 
-* Spindle Motor & Driver
-  * Speed Control
-  * Power Control
+* [Spindle Motor, Driver, Transformer](https://www.aliexpress.com/item/DC-400W-0-4KW-ER11-55MM-Brushless-CNC-Spindle-Motor-WS55-180-DC20-50V-Stepper-Motor/32877065667.html)
   * Automatic Tool Changer
 * Position Measurement
   * [Limit Switch](https://www.aliexpress.com/item/Inductive-Proximity-Sensor-SN04-N-SN04-N2-SN04-P-SN04-P2-DC-NPN-PNP-NO-NC/32830229029.html)
@@ -45,7 +43,12 @@ Plans for a Successor of the PrismCNC
 
 ## Electronics
 
-* [Motor Drivers](https://www.aliexpress.com/item/TB6600-4A-9-42V-Stepper-Motor-Driver-CNC-Controller-Stepper-Motor-Driver-Nema-tb6600-Single-Axes/32702091551.html) x 5
+* Motor Drivers x 5, Alternatives:
+  * [9-42V 4.0A](https://www.aliexpress.com/item/TB6600-4A-9-42V-Stepper-Motor-Driver-CNC-Controller-Stepper-Motor-Driver-Nema-tb6600-Single-Axes/32702091551.html)
+  * [20-50V 4.2A](https://www.aliexpress.com/item/20-50VDC-256-Subdivision-CNC-Micro-Stepping-Name23-DM542-Stepper-Motor-Driver-2phase-4-2A-ST/32858955514.html)
+  * [18-48V 5.6A](https://www.aliexpress.com/store/product/DM556-Digital-Stepper-motor-driver-2-phase-5A-for-57-86-stepper-motor-NEMA23-NEMA34-Stepper/1724883_32861267422.html)
+  * [12-36V 2.0A](https://www.aliexpress.com/item/Stepper-motor-driver-cintroller-DM860-microstep-motor-brushless-DC-motor-shell-for-57-86-stepper-motor/32815822676.html)
+
 * [Plugs](https://de.aliexpress.com/item/Free-shipping-Aviation-connector-2PCS-Diam20mm-GX20-12pin-push-pull-circular-quick-connector-5A-400v-Male/32520387627.html)
 * Cables
 * [2D Joystick](https://www.aliexpress.com/item/Electric-Joystick-potentiometer-JH-D202X-R2-R4-10K-2D-Monitor-Keyboard-ball-controller-For-Photographic-film/32851202122.html) or [4D Joystick](https://www.aliexpress.com/item/1pc-Plastic-4-Axis-Joystick-Potentiometer-Button-49-6-94-5mm-For-JH-D400X-R4-10K/32857307709.html) for Manual Control
