@@ -21,18 +21,17 @@ Plans for a Successor of the PrismCNC
 
 * 3 Axis Linear Guide (Workspace: 650mm x 400mm x 250mm)
   * [Rail](https://www.aliexpress.com/item/6-sets-linear-rail-SBR16-linear-guide-any-length-linear-bearing-blocks-SFU1605-ball-screw-3/32838832050.html)
-  * [Dust Cover (Bellows)](https://www.aliexpress.com/item/Tri-proof-nylon-cloth-accordion-cnc-machine-dust-cover-bellows-W145mm-x-H35mm-x-extension-300mm/32675025594.html)
-  * [Drag Chain](https://www.aliexpress.com/store/product/25-x-103-series-bridge-type-reinforced-type-engineering-nylon-cable-drag-chain-carriers-for-cnc/1202171_32360447975.html)
-  * [Stepper Motors](https://www.aliexpress.com/item/3pcs-lot-4-lead-Nema17-Stepper-Motor-42-motor-Nema-17-motor-42BYGH-1-7A-17HS4401/32841919981.html)
+  * 6x [Dust Cover (Bellows)](https://www.aliexpress.com/item/Tri-proof-nylon-cloth-accordion-cnc-machine-dust-cover-bellows-W145mm-x-H35mm-x-extension-300mm/32675025594.html)
+  * 2x [Drag Chain](https://www.aliexpress.com/store/product/25-x-103-series-bridge-type-reinforced-type-engineering-nylon-cable-drag-chain-carriers-for-cnc/1202171_32360447975.html)
+  * 3x [NEMA23 6.35mm Stepper Motors](https://de.aliexpress.com/item/57-Stepper-motor-18-Step-angle-5718HB3-57BYGH-2-3N-m-76MM-length-D-type-M8/32785982717.html)
+  * 3x [NEMA23 Fixture](https://de.aliexpress.com/item/NEMA23-57-Stepper-Motor-Zubeh-r-L-Montage-Halterung-Mount-befestigt-unterst-tzung-Regal/32895495457.html)
 * [2 Axis Angular](https://www.aliexpress.com/item/Free-shipping-New-K01-100-Chuck-CNC-4th-axis-5th-axis-A-aixs-rotary-axis-for/2053559551.html)
 
 ## Milling
 
 * [Spindle Motor, Driver, Transformer](https://www.aliexpress.com/item/DC-400W-0-4KW-ER11-55MM-Brushless-CNC-Spindle-Motor-WS55-180-DC20-50V-Stepper-Motor/32877065667.html)
   * Automatic Tool Changer
-* Position Measurement
-  * [Limit Switch](https://www.aliexpress.com/item/Inductive-Proximity-Sensor-SN04-N-SN04-N2-SN04-P-SN04-P2-DC-NPN-PNP-NO-NC/32830229029.html)
-  * [Tool Length](https://www.aliexpress.com/item/Factory-selling-CNC-tool-sensor-Cnc-Router-Tool-Setting-Auto-Check-Instrument-CNC-sensor-block-tool/32804279511.html)
+* [Tool Length](https://www.aliexpress.com/item/Factory-selling-CNC-tool-sensor-Cnc-Router-Tool-Setting-Auto-Check-Instrument-CNC-sensor-block-tool/32804279511.html)
 * [Tool Holders](https://www.aliexpress.com/item/1Pcs-ISO20-ER20-Collet-Chuck-holder-30-000RPM-ISO-Spindle-holder-CNC-Mill/32780407049.html)
 * [Collets](https://www.aliexpress.com/item/13Pcs-1-13mm-ER20-Spring-Collet-Set-CNC-Workholding-Engraving-Milling-Lathe-VEC56-T0-45/32793314111.html)
 * Coolant
@@ -43,7 +42,9 @@ Plans for a Successor of the PrismCNC
 
 ## Electronics
 
-* Motor Drivers x 5, Alternatives:
+* Logic Level Converter
+* 6x [Limit Switch 6V](https://www.aliexpress.com/item/Inductive-Proximity-Sensor-SN04-N-SN04-N2-SN04-P-SN04-P2-DC-NPN-PNP-NO-NC/32830229029.html)
+* 5x Motor Drivers, Options:
   * [9-42V 4.0A](https://www.aliexpress.com/item/TB6600-4A-9-42V-Stepper-Motor-Driver-CNC-Controller-Stepper-Motor-Driver-Nema-tb6600-Single-Axes/32702091551.html)
   * [20-50V 4.2A](https://www.aliexpress.com/item/20-50VDC-256-Subdivision-CNC-Micro-Stepping-Name23-DM542-Stepper-Motor-Driver-2phase-4-2A-ST/32858955514.html)
   * [18-48V 5.6A](https://www.aliexpress.com/store/product/DM556-Digital-Stepper-motor-driver-2-phase-5A-for-57-86-stepper-motor-NEMA23-NEMA34-Stepper/1724883_32861267422.html)
