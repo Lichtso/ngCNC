@@ -8,10 +8,12 @@ Plans for a Successor of the PrismCNC
   * Stainless Steel Plates
   * [Aluminum Honeycombs with Frame](https://de.aliexpress.com/item/Size-can-be-customized-Honeycomb-Working-Table-300x200mm-Laser-Enquipment-Parts-For-CO2-Laser-Engraver-Cutting/32791623758.html)
 * Legs / Feet
-* [Aluminum Extrusion Profile](https://www.aliexpress.com/item/Aluminum-Profile-Aluminum-Extrusion-Profile-4040-40-40-commonly-used-in-assembling-device-frame-table-and/32320585430.html)
-* [Connection Plates](https://www.aliexpress.com/item/European-Standard-Carbon-Steel-T-Type-Connection-Plate-for-4040-Aluminum-Extrusion-Profile-Set-of-2/32842401219.html)
-* [Corners](https://www.aliexpress.com/item/10pcs-4040-Corner-Bracket-Fittings-40-40-Corner-Angle-L-Breakets-Connector-Aluminum-Profile-Accessories/32779895384.html)
-* [Nut Hammer Heads](https://www.aliexpress.com/item/20pcs-10pcs-M4-M5-M6-M8-T-nut-Hammer-Head-Nut-Bolt-for-4545-4040-series/32825313543.html)
+* Aluminum Extrusion Profiles:
+  * ?x [3030](https://de.aliexpress.com/store/product/3030-aluminum-extrusion-profile-european-standard-length-100mm-wall-thickness-1-8mm-industrial-aluminum-profile-workbench/834897_32763960938.html)
+  * 2x [30150](https://de.aliexpress.com/item/30150-aluminum-extrusion-profile-european-standard-white-length-600mm-industrial-aluminum-profile-workbench-1pcs/32869356113.html)
+* ?x [Connection Plates](https://de.aliexpress.com/store/product/5-Hole-Angle-Bracket-Joint-Strip-Board-for-Aluminum-Profile-Extrusion-2020-3030/3392012_32858453314.html)
+* ?x [Corners](https://de.aliexpress.com/store/product/SULEVE-New-1pc-Aluminium-Alloy-Black-Corner-Bracket-Angle-Corner-Joint-Angle-Bracket-for-3030-Aluminum/3085068_32856874973.html)
+* ?x [Nut Hammer Heads](https://de.aliexpress.com/store/product/T-Slot-30-m5-30-m4-30-M6-m4-m5-m6-hammer-t-mutter-f-r/838734_32849315746.html)
 * Acrylic / Perspex Box (Fish Tank?)
   * With Doors / Hatches
 * Metal Box for Electronics
@@ -20,11 +22,12 @@ Plans for a Successor of the PrismCNC
 ## Robotics
 
 * 3 Axis Linear Guide (Workspace: 650mm x 400mm x 250mm)
-  * [Rail](https://www.aliexpress.com/item/6-sets-linear-rail-SBR16-linear-guide-any-length-linear-bearing-blocks-SFU1605-ball-screw-3/32838832050.html)
+  * [Rails](https://www.aliexpress.com/item/6-sets-linear-rail-SBR16-linear-guide-any-length-linear-bearing-blocks-SFU1605-ball-screw-3/32838832050.html)
+  * 2x [FUB16H](https://de.aliexpress.com/item/1-PCS-CNC-aluminum-plate-FUB16H-for-1605-nut-housing-and-SBR16UU/32680540907.html)
   * 6x [Dust Cover (Bellows)](https://www.aliexpress.com/item/Tri-proof-nylon-cloth-accordion-cnc-machine-dust-cover-bellows-W145mm-x-H35mm-x-extension-300mm/32675025594.html)
   * 2x [Drag Chain](https://www.aliexpress.com/store/product/25-x-103-series-bridge-type-reinforced-type-engineering-nylon-cable-drag-chain-carriers-for-cnc/1202171_32360447975.html)
   * 3x [NEMA23 6.35mm Stepper Motors](https://de.aliexpress.com/item/57-Stepper-motor-18-Step-angle-5718HB3-57BYGH-2-3N-m-76MM-length-D-type-M8/32785982717.html)
-  * 3x [NEMA23 Fixture](https://de.aliexpress.com/item/NEMA23-57-Stepper-Motor-Zubeh-r-L-Montage-Halterung-Mount-befestigt-unterst-tzung-Regal/32895495457.html)
+  * 3x [NEMA23 Mount](https://de.aliexpress.com/item/NEMA-23-57-Schrittmotor-Halterung-Basis-Mount-Feste-Halterung-Sitz-f-r-CNC/32849707675.html)
 * [2 Axis Angular](https://www.aliexpress.com/item/Free-shipping-New-K01-100-Chuck-CNC-4th-axis-5th-axis-A-aixs-rotary-axis-for/2053559551.html)
 
 ## Milling
@@ -44,12 +47,7 @@ Plans for a Successor of the PrismCNC
 
 * Logic Level Converter
 * 6x [Limit Switch 6V](https://www.aliexpress.com/item/Inductive-Proximity-Sensor-SN04-N-SN04-N2-SN04-P-SN04-P2-DC-NPN-PNP-NO-NC/32830229029.html)
-* 5x Motor Drivers, Options:
-  * [9-42V 4.0A](https://www.aliexpress.com/item/TB6600-4A-9-42V-Stepper-Motor-Driver-CNC-Controller-Stepper-Motor-Driver-Nema-tb6600-Single-Axes/32702091551.html)
-  * [20-50V 4.2A](https://www.aliexpress.com/item/20-50VDC-256-Subdivision-CNC-Micro-Stepping-Name23-DM542-Stepper-Motor-Driver-2phase-4-2A-ST/32858955514.html)
-  * [18-48V 5.6A](https://www.aliexpress.com/store/product/DM556-Digital-Stepper-motor-driver-2-phase-5A-for-57-86-stepper-motor-NEMA23-NEMA34-Stepper/1724883_32861267422.html)
-  * [12-36V 2.0A](https://www.aliexpress.com/item/Stepper-motor-driver-cintroller-DM860-microstep-motor-brushless-DC-motor-shell-for-57-86-stepper-motor/32815822676.html)
-
+* [5x Motor Drivers](https://www.aliexpress.com/item/5PCS-CNC-Single-Axis-4A-TB6600-Stepper-Motor-Drivers-Controller/32825332102.html)
 * [Plugs](https://de.aliexpress.com/item/Free-shipping-Aviation-connector-2PCS-Diam20mm-GX20-12pin-push-pull-circular-quick-connector-5A-400v-Male/32520387627.html)
 * Cables
 * [2D Joystick](https://www.aliexpress.com/item/Electric-Joystick-potentiometer-JH-D202X-R2-R4-10K-2D-Monitor-Keyboard-ball-controller-For-Photographic-film/32851202122.html) or [4D Joystick](https://www.aliexpress.com/item/1pc-Plastic-4-Axis-Joystick-Potentiometer-Button-49-6-94-5mm-For-JH-D400X-R4-10K/32857307709.html) for Manual Control
