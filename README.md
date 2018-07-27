@@ -24,7 +24,7 @@ Plans for a Successor of the PrismCNC
 * 3 Axis Linear Guide (Workspace: 650mm x 400mm x 250mm)
   * [950mm x 560mm x 410mm Rails](https://www.aliexpress.com/item/6-sets-linear-rail-SBR16-linear-guide-any-length-linear-bearing-blocks-SFU1605-ball-screw-3/32838832050.html)
   * 2x [FUB16H](https://de.aliexpress.com/item/1-PCS-CNC-aluminum-plate-FUB16H-for-1605-nut-housing-and-SBR16UU/32680540907.html)
-  * 6x [Dust Cover (Bellows)](https://www.aliexpress.com/item/Tri-proof-nylon-cloth-accordion-cnc-machine-dust-cover-bellows-W145mm-x-H35mm-x-extension-300mm/32675025594.html)
+  * 4x [Dust Cover (Bellows)](https://www.aliexpress.com/store/product/Rectangler-accordion-flexible-bellows-inside-200mm-80mm-outer-230mm-110mm/1202171_32711620982.html)
   * 2x [Drag Chain](https://de.aliexpress.com/item/18x25-halbgeschlossenen-abschleppen-kette-kabelschlepp/32655908714.html)
   * 3x [NEMA23 6.35mm Stepper Motors](https://de.aliexpress.com/item/57-Stepper-motor-18-Step-angle-5718HB3-57BYGH-2-3N-m-76MM-length-D-type-M8/32785982717.html)
   * 3x [NEMA23 Mount](https://de.aliexpress.com/item/NEMA-23-57-Schrittmotor-Halterung-Basis-Mount-Feste-Halterung-Sitz-f-r-CNC/32849707675.html)
@@ -32,7 +32,7 @@ Plans for a Successor of the PrismCNC
 
 ## Milling
 
-* [ER11 400W Spindle Motor, Driver, Transformer](https://www.aliexpress.com/item/DC-400W-0-4KW-ER11-55MM-Brushless-CNC-Spindle-Motor-WS55-180-DC20-50V-Stepper-Motor/32877065667.html)
+* [ER11 500W Spindle Motor, Clamp, Driver, Transformer](https://www.aliexpress.com/item/500W-ER11-DC-spindle-48V-cnc-Spindle-C00005-for-cnc-router/32808962780.html)
   * Automatic Tool Changer
 * [Tool Length](https://www.aliexpress.com/item/Factory-selling-CNC-tool-sensor-Cnc-Router-Tool-Setting-Auto-Check-Instrument-CNC-sensor-block-tool/32804279511.html)
 * [Tool Holders](https://www.aliexpress.com/item/1Pcs-ISO20-ER20-Collet-Chuck-holder-30-000RPM-ISO-Spindle-holder-CNC-Mill/32780407049.html)
