@@ -22,10 +22,10 @@ Plans for a Successor of the PrismCNC
 ## Robotics
 
 * 3 Axis Linear Guide (Workspace: 650mm x 400mm x 250mm)
-  * [950mm x 560mm x 410mm Rails](https://www.aliexpress.com/item/6-sets-linear-rail-SBR16-linear-guide-any-length-linear-bearing-blocks-SFU1605-ball-screw-3/32838832050.html)
+  * [1000mm x 600mm x 450mm Ball Screws, 935mm x 535mm x 385mm Rails](https://www.aliexpress.com/item/6-sets-linear-rail-SBR16-linear-guide-any-length-linear-bearing-blocks-SFU1605-ball-screw-3/32838832050.html)
   * 2x [FUB16H](https://de.aliexpress.com/item/1-PCS-CNC-aluminum-plate-FUB16H-for-1605-nut-housing-and-SBR16UU/32680540907.html)
   * 4x [Dust Cover (Bellows)](https://www.aliexpress.com/store/product/Rectangler-accordion-flexible-bellows-inside-200mm-80mm-outer-230mm-110mm/1202171_32711620982.html)
-  * 2x [Drag Chain](https://de.aliexpress.com/item/18x25-halbgeschlossenen-abschleppen-kette-kabelschlepp/32655908714.html)
+  * 3x [Drag Chain](https://de.aliexpress.com/item/18x25-halbgeschlossenen-abschleppen-kette-kabelschlepp/32655908714.html)
   * 3x [NEMA23 6.35mm Stepper Motors](https://de.aliexpress.com/item/57-Stepper-motor-18-Step-angle-5718HB3-57BYGH-2-3N-m-76MM-length-D-type-M8/32785982717.html)
   * 3x [NEMA23 Mount](https://de.aliexpress.com/item/NEMA-23-57-Schrittmotor-Halterung-Basis-Mount-Feste-Halterung-Sitz-f-r-CNC/32849707675.html)
 * [2 Axis Angular](https://www.aliexpress.com/item/Free-shipping-New-K01-100-Chuck-CNC-4th-axis-5th-axis-A-aixs-rotary-axis-for/2053559551.html)
@@ -45,8 +45,8 @@ Plans for a Successor of the PrismCNC
 
 ## Electronics
 
-* Logic Level Converter
-* 6x [Limit Switch 6V](https://www.aliexpress.com/item/Inductive-Proximity-Sensor-SN04-N-SN04-N2-SN04-P-SN04-P2-DC-NPN-PNP-NO-NC/32830229029.html)
+* [Opamp for spindle motor driver](https://www.aliexpress.com/item/100PCS-DIP8-IC-UA741CN-UA741CP-UA741-OP-Amp-LM741-741-TI-IC-OPAMP-GP-1MHZ-Free/32389829940.html)
+* 10x [Limit Switch 6V](https://www.aliexpress.com/item/Inductive-Proximity-Sensor-SN04-N-SN04-N2-SN04-P-SN04-P2-DC-NPN-PNP-NO-NC/32830229029.html)
 * [5x Motor Drivers](https://www.aliexpress.com/item/5PCS-CNC-Single-Axis-4A-TB6600-Stepper-Motor-Drivers-Controller/32825332102.html)
 * [Plugs](https://de.aliexpress.com/item/Free-shipping-Aviation-connector-2PCS-Diam20mm-GX20-12pin-push-pull-circular-quick-connector-5A-400v-Male/32520387627.html)
 * Cables
