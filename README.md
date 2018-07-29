@@ -22,7 +22,7 @@ Plans for a Successor of the PrismCNC
 ## Robotics
 
 * 3 Axis Linear Guide (Workspace: 650mm x 400mm x 250mm)
-  * [1000mm x 600mm x 450mm Ball Screws, 935mm x 535mm x 385mm Rails](https://www.aliexpress.com/item/6-sets-linear-rail-SBR16-linear-guide-any-length-linear-bearing-blocks-SFU1605-ball-screw-3/32838832050.html)
+  * [1000mm x 600mm x 450mm Linear Guide](https://www.aliexpress.com/item/6-sets-linear-rail-SBR16-linear-guide-any-length-linear-bearing-blocks-SFU1605-ball-screw-3/32838832050.html)
   * 2x [FUB16H](https://de.aliexpress.com/item/1-PCS-CNC-aluminum-plate-FUB16H-for-1605-nut-housing-and-SBR16UU/32680540907.html)
   * 4x [Dust Cover (Bellows)](https://www.aliexpress.com/store/product/Rectangler-accordion-flexible-bellows-inside-200mm-80mm-outer-230mm-110mm/1202171_32711620982.html)
   * 3x [Drag Chain](https://de.aliexpress.com/item/18x25-halbgeschlossenen-abschleppen-kette-kabelschlepp/32655908714.html)
@@ -45,18 +45,20 @@ Plans for a Successor of the PrismCNC
 
 ## Electronics
 
-* [Opamp for spindle motor driver](https://www.aliexpress.com/item/100PCS-DIP8-IC-UA741CN-UA741CP-UA741-OP-Amp-LM741-741-TI-IC-OPAMP-GP-1MHZ-Free/32389829940.html)
-* 10x [Limit Switch 6V](https://www.aliexpress.com/item/Inductive-Proximity-Sensor-SN04-N-SN04-N2-SN04-P-SN04-P2-DC-NPN-PNP-NO-NC/32830229029.html)
 * [5x Motor Drivers](https://www.aliexpress.com/item/5PCS-CNC-Single-Axis-4A-TB6600-Stepper-Motor-Drivers-Controller/32825332102.html)
-* [Plugs](https://de.aliexpress.com/item/Free-shipping-Aviation-connector-2PCS-Diam20mm-GX20-12pin-push-pull-circular-quick-connector-5A-400v-Male/32520387627.html)
+* 10x [Limit Switch SN04-N 6-36V](https://de.aliexpress.com/item/Induktive-Proximity-Sensor-SN04-N-SN04-N2-SN04-P-SN04-P2-DC-NPN-PNP-NO-NC/32864875404.html)
+* 10x [4 channel logic level converter](https://www.aliexpress.com/item/5PCS-IIC-I2C-Logic-Level-Converter-Bi-Directional-Module-5V-to-3-3V-For-Arduino/32216849765.html)
+* [Opamp for spindle motor driver](https://www.aliexpress.com/item/100PCS-DIP8-IC-UA741CN-UA741CP-UA741-OP-Amp-LM741-741-TI-IC-OPAMP-GP-1MHZ-Free/32389829940.html)
+* [5pin for spindle motor driver](https://de.aliexpress.com/item/10-sets-5-08-2pin-Terminal-plug-type-300V-10A-5-08mm-pitch-connector-pcb-screw/32791916366.html)
+* [10pin for spindle motor driver](https://de.aliexpress.com/item/10sets-Plug-in-terminal-block-KF2EDGK-pitch-3-5MM-2P-3P-4P-10P-Phoenix-terminal-Straight/32808354066.html)
+* 5x 6pin, 1x 3pin [Plugs](https://de.aliexpress.com/item/Free-shipping-Aviation-connector-2PCS-Diam20mm-GX20-12pin-push-pull-circular-quick-connector-5A-400v-Male/32520387627.html)
 * Cables
-* [2D Joystick](https://www.aliexpress.com/item/Electric-Joystick-potentiometer-JH-D202X-R2-R4-10K-2D-Monitor-Keyboard-ball-controller-For-Photographic-film/32851202122.html) or [4D Joystick](https://www.aliexpress.com/item/1pc-Plastic-4-Axis-Joystick-Potentiometer-Button-49-6-94-5mm-For-JH-D400X-R4-10K/32857307709.html) for Manual Control
-* [Emergency Stop Button](https://www.aliexpress.com/item/Waterproof-Twist-to-Reset-Emergency-Stop-Station-Push-Button-Switch-600V-10A/32488958413.html)
-* Arduino for Realtime Control
+* [Red emergency stop button](https://www.aliexpress.com/item/16mm-Metal-brass-Push-Button-Switch-flat-round-illumination-ring-Latching-1NO-1NC-Car-press-button/32676526568.html)
+* [Arduino Due for realtime control](https://www.aliexpress.com/item/Black-Due-R3-Board-DUE-CH340-ATSAM3X8E-ARM-Main-Control-Board-with-50cm-USB-Cable-CH340G/32853462985.html)
 * Raspery PI or similar
   * Ethernet Port (RJ-45)
 * Power Supply
-  * [Transformer](https://www.aliexpress.com/item/300W-B-Dual-output-5V-24V-Switching-power-supply-AC-to-DC-25A-DC-7A/1586462604.html)
+  * [Power Supply 400W 12V 33A](https://de.aliexpress.com/item/Promotion-400W-Switch-Power-Supply-Driver-for-LED-Strip-Light-DC-12V-33A/32717685079.html)
   * [IEC 60320 (C14) with Fuse and Switch](https://www.aliexpress.com/item/3-In-1-Fused-Holder-Switch-10A-AC-250V-IEC320-C14-Inlet-Male-Power-Socket-Connector/32854443760.html)
 
 ## Software
