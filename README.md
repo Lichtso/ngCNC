@@ -12,7 +12,7 @@ Plans for a Successor of the PrismCNC
   * ?x [3030](https://de.aliexpress.com/store/product/3030-aluminum-extrusion-profile-european-standard-length-100mm-wall-thickness-1-8mm-industrial-aluminum-profile-workbench/834897_32763960938.html)
   * 2x [30150](https://de.aliexpress.com/item/30150-aluminum-extrusion-profile-european-standard-white-length-600mm-industrial-aluminum-profile-workbench-1pcs/32869356113.html)
 * ?x [Connection Plates](https://de.aliexpress.com/store/product/5-Hole-Angle-Bracket-Joint-Strip-Board-for-Aluminum-Profile-Extrusion-2020-3030/3392012_32858453314.html)
-* ?x [Corners](https://de.aliexpress.com/store/product/SULEVE-New-1pc-Aluminium-Alloy-Black-Corner-Bracket-Angle-Corner-Joint-Angle-Bracket-for-3030-Aluminum/3085068_32856874973.html)
+* ?x [Corners](https://www.aliexpress.com/store/product/10-pcs-3030-2-Hole-Strong-Inside-Corner-Bracket-Gusset-for-3030-Series-Aluminum-Extrusion-Profile/2995034_32890800259.html)
 * ?x [Nut Hammer Heads](https://de.aliexpress.com/store/product/T-Slot-30-m5-30-m4-30-M6-m4-m5-m6-hammer-t-mutter-f-r/838734_32849315746.html)
 * Acrylic / Perspex Box (Fish Tank?)
   * With Doors / Hatches
@@ -25,7 +25,8 @@ Plans for a Successor of the PrismCNC
   * [1000mm x 600mm x 450mm Linear Guide](https://www.aliexpress.com/item/6-sets-linear-rail-SBR16-linear-guide-any-length-linear-bearing-blocks-SFU1605-ball-screw-3/32838832050.html)
   * 2x [FUB16H](https://de.aliexpress.com/item/1-PCS-CNC-aluminum-plate-FUB16H-for-1605-nut-housing-and-SBR16UU/32680540907.html)
   * 4x [Dust Cover (Bellows)](https://www.aliexpress.com/store/product/Rectangler-accordion-flexible-bellows-inside-200mm-80mm-outer-230mm-110mm/1202171_32711620982.html)
-  * 3x [Drag Chain](https://de.aliexpress.com/item/18x25-halbgeschlossenen-abschleppen-kette-kabelschlepp/32655908714.html)
+  * 2x [Drag Chain (15x20x1000)](https://de.aliexpress.com/store/product/Free-Shipping-Cable-Chains-15-20-15-30mm-Bridge-Type-Non-Opening-1-Meter-Plastic-Towline/1090037_32823055912.html)
+  * [Drag Chain (15x30x1000)](https://de.aliexpress.com/item/WSFS-Hot-JFLO-100cm-R38-Semi-Closed-Black-Long-Nylon-Cable-Drag-Chain-Wire-Carrier-15/32772781609.html)
   * 3x [NEMA23 6.35mm Stepper Motors](https://de.aliexpress.com/item/57-Stepper-motor-18-Step-angle-5718HB3-57BYGH-2-3N-m-76MM-length-D-type-M8/32785982717.html)
   * 3x [NEMA23 Mount](https://de.aliexpress.com/item/NEMA-23-57-Schrittmotor-Halterung-Basis-Mount-Feste-Halterung-Sitz-f-r-CNC/32849707675.html)
 * [2 Axis Angular](https://www.aliexpress.com/item/Free-shipping-New-K01-100-Chuck-CNC-4th-axis-5th-axis-A-aixs-rotary-axis-for/2053559551.html)
@@ -46,6 +47,7 @@ Plans for a Successor of the PrismCNC
 ## Electronics
 
 * [5x Motor Drivers](https://www.aliexpress.com/item/5PCS-CNC-Single-Axis-4A-TB6600-Stepper-Motor-Drivers-Controller/32825332102.html)
+* [Laser Light Barrier](https://de.aliexpress.com/item/Laser-optischer-sensor-sichtbar-licht-auf-die-laser-strahl-zu-die-NPN-M8-messen-abstand-20/32863876445.html)
 * 10x [Limit Switch SN04-N 6-36V](https://de.aliexpress.com/item/Induktive-Proximity-Sensor-SN04-N-SN04-N2-SN04-P-SN04-P2-DC-NPN-PNP-NO-NC/32864875404.html)
 * 10x [4 channel logic level converter](https://www.aliexpress.com/item/5PCS-IIC-I2C-Logic-Level-Converter-Bi-Directional-Module-5V-to-3-3V-For-Arduino/32216849765.html)
 * [Opamp for spindle motor driver](https://www.aliexpress.com/item/100PCS-DIP8-IC-UA741CN-UA741CP-UA741-OP-Amp-LM741-741-TI-IC-OPAMP-GP-1MHZ-Free/32389829940.html)
