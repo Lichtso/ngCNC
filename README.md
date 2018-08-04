@@ -6,14 +6,14 @@ Plans for a Successor of the PrismCNC
 
 * Base Plate Composite
   * Stainless Steel Plates
-  * [Aluminum Honeycombs with Frame](https://de.aliexpress.com/item/Size-can-be-customized-Honeycomb-Working-Table-300x200mm-Laser-Enquipment-Parts-For-CO2-Laser-Engraver-Cutting/32791623758.html)
+  * [Aluminum Honeycombs with Frame](https://www.aliexpress.com/item/Size-can-be-customized-Honeycomb-Working-Table-300x200mm-Laser-Enquipment-Parts-For-CO2-Laser-Engraver-Cutting/32791623758.html)
 * Legs / Feet
 * Aluminum Extrusion Profiles:
-  * ?x [3030](https://de.aliexpress.com/store/product/3030-aluminum-extrusion-profile-european-standard-length-100mm-wall-thickness-1-8mm-industrial-aluminum-profile-workbench/834897_32763960938.html)
-  * 2x [30150](https://de.aliexpress.com/item/30150-aluminum-extrusion-profile-european-standard-white-length-600mm-industrial-aluminum-profile-workbench-1pcs/32869356113.html)
-* ?x [Connection Plates](https://de.aliexpress.com/store/product/5-Hole-Angle-Bracket-Joint-Strip-Board-for-Aluminum-Profile-Extrusion-2020-3030/3392012_32858453314.html)
-* ?x [Corners](https://www.aliexpress.com/store/product/10-pcs-3030-2-Hole-Strong-Inside-Corner-Bracket-Gusset-for-3030-Series-Aluminum-Extrusion-Profile/2995034_32890800259.html)
-* ?x [Nut Hammer Heads](https://de.aliexpress.com/store/product/T-Slot-30-m5-30-m4-30-M6-m4-m5-m6-hammer-t-mutter-f-r/838734_32849315746.html)
+  * ?x [3030](https://www.aliexpress.com/item/3030-aluminum-extrusion-profile-european-standard-length-100mm-wall-thickness-1-8mm-industrial-aluminum-profile-workbench/32763960938.html)
+  * 2x [30150](https://www.aliexpress.com/item/30150-aluminum-extrusion-profile-european-standard-white-length-600mm-industrial-aluminum-profile-workbench-1pcs/32869356113.html)
+* ?x [Connection Plates](https://www.aliexpress.com/item/5-Hole-Angle-Bracket-Joint-Strip-Board-for-Aluminum-Profile-Extrusion-2020-3030/32858453314.html)
+* ?x [Corners](https://www.aliexpress.com/item/10-pcs-3030-2-Hole-Strong-Inside-Corner-Bracket-Gusset-for-3030-Series-Aluminum-Extrusion-Profile/32890800259.html)
+* ?x [Nut Hammer Heads](https://www.aliexpress.com/item/T-Slot-30-m5-30-m4-30-M6-m4-m5-m6-hammer-t-nut-for-aluminum/32849315746.html)
 * Acrylic / Perspex Box (Fish Tank?)
   * With Doors / Hatches
 * Metal Box for Electronics
@@ -23,12 +23,12 @@ Plans for a Successor of the PrismCNC
 
 * 3 Axis Linear Guide (Workspace: 650mm x 400mm x 250mm)
   * [1000mm x 600mm x 450mm Linear Guide](https://www.aliexpress.com/item/6-sets-linear-rail-SBR16-linear-guide-any-length-linear-bearing-blocks-SFU1605-ball-screw-3/32838832050.html)
-  * 2x [FUB16H](https://de.aliexpress.com/item/1-PCS-CNC-aluminum-plate-FUB16H-for-1605-nut-housing-and-SBR16UU/32680540907.html)
-  * 4x [Dust Cover (Bellows)](https://www.aliexpress.com/store/product/Rectangler-accordion-flexible-bellows-inside-200mm-80mm-outer-230mm-110mm/1202171_32711620982.html)
-  * 2x [Drag Chain (15x20x1000)](https://de.aliexpress.com/store/product/Free-Shipping-Cable-Chains-15-20-15-30mm-Bridge-Type-Non-Opening-1-Meter-Plastic-Towline/1090037_32823055912.html)
-  * [Drag Chain (15x30x1000)](https://de.aliexpress.com/item/WSFS-Hot-JFLO-100cm-R38-Semi-Closed-Black-Long-Nylon-Cable-Drag-Chain-Wire-Carrier-15/32772781609.html)
-  * 3x [NEMA23 6.35mm Stepper Motors](https://de.aliexpress.com/item/57-Stepper-motor-18-Step-angle-5718HB3-57BYGH-2-3N-m-76MM-length-D-type-M8/32785982717.html)
-  * 3x [NEMA23 Mount](https://de.aliexpress.com/item/NEMA-23-57-Schrittmotor-Halterung-Basis-Mount-Feste-Halterung-Sitz-f-r-CNC/32849707675.html)
+  * 2x [FUB16H](https://www.aliexpress.com/item/1-PCS-CNC-aluminum-plate-FUB16H-for-1605-nut-housing-and-SBR16UU/32680540907.html)
+  * 4x [Dust Cover (Bellows)](https://www.aliexpress.com/item/Rectangler-accordion-flexible-bellows-inside-200mm-80mm-outer-230mm-110mm/32711620982.html)
+  * 2x [Drag Chain (15x20x1000)](https://www.aliexpress.com/item/Free-Shipping-Cable-Chains-15-20-15-30mm-Bridge-Type-Non-Opening-1-Meter-Plastic-Towline/32823055912.html)
+  * [Drag Chain (15x30x1000)](https://www.aliexpress.com/item/WSFS-Hot-JFLO-100cm-R38-Semi-Closed-Black-Long-Nylon-Cable-Drag-Chain-Wire-Carrier-15/32772781609.html)
+  * 3x [NEMA23 6.35mm Stepper Motors](https://www.aliexpress.com/item/57-Stepper-motor-18-Step-angle-5718HB3-57BYGH-2-3N-m-76MM-length-D-type-M8/32785982717.html)
+  * 3x [NEMA23 Mount](https://www.aliexpress.com/item/NEMA-23-57-Stepper-Motor-Bracket-Base-Mount-Fixed-Mounting-Seat-for-CNC/32849707675.html)
 * [2 Axis Angular](https://www.aliexpress.com/item/Free-shipping-New-K01-100-Chuck-CNC-4th-axis-5th-axis-A-aixs-rotary-axis-for/2053559551.html)
 
 ## Milling
@@ -37,7 +37,7 @@ Plans for a Successor of the PrismCNC
   * Automatic Tool Changer
 * [Tool Length](https://www.aliexpress.com/item/Factory-selling-CNC-tool-sensor-Cnc-Router-Tool-Setting-Auto-Check-Instrument-CNC-sensor-block-tool/32804279511.html)
 * [Tool Holders](https://www.aliexpress.com/item/1Pcs-ISO20-ER20-Collet-Chuck-holder-30-000RPM-ISO-Spindle-holder-CNC-Mill/32780407049.html)
-* [ER11 Collets](https://de.aliexpress.com/store/product/13Pcs-ER11-Spring-Collet-Set-for-CNC-Engraving-Machine-milling-Lathe-Tool-VEC11-T0-41/1291913_32788738302.html)
+* [ER11 Collets](https://www.aliexpress.com/item/13Pcs-ER11-Spring-Collet-Set-for-CNC-Engraving-Machine-milling-Lathe-Tool-VEC11-T0-41/32788738302.html)
 * Coolant
   * [Spray](https://www.aliexpress.com/item/1pc-Mist-Coolant-Lubrication-Spray-System-High-Quality-Mist-Coolant-System-For-8mm-Air-Pipe-CNC/32825718858.html)
   * Pump & Driver
@@ -47,20 +47,20 @@ Plans for a Successor of the PrismCNC
 ## Electronics
 
 * [5x Motor Drivers](https://www.aliexpress.com/item/5PCS-CNC-Single-Axis-4A-TB6600-Stepper-Motor-Drivers-Controller/32825332102.html)
-* [Laser Light Barrier](https://de.aliexpress.com/item/Laser-optischer-sensor-sichtbar-licht-auf-die-laser-strahl-zu-die-NPN-M8-messen-abstand-20/32863876445.html)
-* 10x [Limit Switch SN04-N 6-36V](https://de.aliexpress.com/item/Induktive-Proximity-Sensor-SN04-N-SN04-N2-SN04-P-SN04-P2-DC-NPN-PNP-NO-NC/32864875404.html)
+* [Laser Light Barrier](https://www.aliexpress.com/item/Laser-photoelectric-sensor-visible-light-on-the-laser-beam-to-the-NPN-M8-measure-distance-20m/32863876445.html)
+* 10x [Limit Switch SN04-N 6-36V](https://www.aliexpress.com/item/Inductive-Proximity-Sensor-SN04-N-SN04-N2-SN04-P-SN04-P2-DC-NPN-PNP-NO-NC/32864875404.html)
 * 10x [4 channel logic level converter](https://www.aliexpress.com/item/5PCS-IIC-I2C-Logic-Level-Converter-Bi-Directional-Module-5V-to-3-3V-For-Arduino/32216849765.html)
 * [Opamp for spindle motor driver](https://www.aliexpress.com/item/100PCS-DIP8-IC-UA741CN-UA741CP-UA741-OP-Amp-LM741-741-TI-IC-OPAMP-GP-1MHZ-Free/32389829940.html)
-* [5pin for spindle motor driver](https://de.aliexpress.com/item/10-sets-5-08-2pin-Terminal-plug-type-300V-10A-5-08mm-pitch-connector-pcb-screw/32791916366.html)
-* [10pin for spindle motor driver](https://de.aliexpress.com/item/10sets-Plug-in-terminal-block-KF2EDGK-pitch-3-5MM-2P-3P-4P-10P-Phoenix-terminal-Straight/32808354066.html)
-* 5x 6pin, 1x 3pin [Plugs](https://de.aliexpress.com/item/Free-shipping-Aviation-connector-2PCS-Diam20mm-GX20-12pin-push-pull-circular-quick-connector-5A-400v-Male/32520387627.html)
+* [5pin for spindle motor driver](https://www.aliexpress.com/item/10-sets-5-08-2pin-Terminal-plug-type-300V-10A-5-08mm-pitch-connector-pcb-screw/32791916366.html)
+* [10pin for spindle motor driver](https://www.aliexpress.com/item/10sets-Plug-in-terminal-block-KF2EDGK-pitch-3-5MM-2P-3P-4P-10P-Phoenix-terminal-Straight/32808354066.html)
+* 5x 6pin, 1x 3pin [Plugs](https://www.aliexpress.com/item/Free-shipping-Aviation-connector-2PCS-Diam20mm-GX20-12pin-push-pull-circular-quick-connector-5A-400v-Male/32520387627.html)
 * Cables
 * [Red emergency stop button](https://www.aliexpress.com/item/16mm-Metal-brass-Push-Button-Switch-flat-round-illumination-ring-Latching-1NO-1NC-Car-press-button/32676526568.html)
 * [Arduino Due for realtime control](https://www.aliexpress.com/item/Black-Due-R3-Board-DUE-CH340-ATSAM3X8E-ARM-Main-Control-Board-with-50cm-USB-Cable-CH340G/32853462985.html)
 * Raspery PI or similar
   * Ethernet Port (RJ-45)
 * Power Supply
-  * [Power Supply 400W 12V 33A](https://de.aliexpress.com/item/Promotion-400W-Switch-Power-Supply-Driver-for-LED-Strip-Light-DC-12V-33A/32717685079.html)
+  * [Power Supply 400W 12V 33A](https://www.aliexpress.com/item/Promotion-400W-Switch-Power-Supply-Driver-for-LED-Strip-Light-DC-12V-33A/32717685079.html)
   * [IEC 60320 (C14) with Fuse and Switch](https://www.aliexpress.com/item/3-In-1-Fused-Holder-Switch-10A-AC-250V-IEC320-C14-Inlet-Male-Power-Socket-Connector/32854443760.html)
 
 ## Software
