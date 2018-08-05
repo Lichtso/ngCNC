@@ -1,0 +1,11 @@
+---
+- hosts: rpi3
+
+  tasks:
+  - timezone:
+      name: Europe/Berlin
+  - pacman: update_cache=yes
+  - pacman:
+      pkg: ansible,nodejs,npm
+      state: latest
+  - lineinfile: dest=/etc/ssh/sshd_config state=present insertafter="^# Authentication" line="PermitRootLogin yes"
