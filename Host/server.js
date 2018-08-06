@@ -1,49 +1,46 @@
 const fs = require('fs'),
       path = require('path'),
-      http = require('http');
+      http2 = require('http2'),
+      hostingRoot = '../Interface',
+      hostingDefault = 'main.html',
+      contentTypeByExtension = {
+    '.txt': 'text/plain',
+    '.js': 'text/javascript',
+    '.json': 'application/json',
+    '.html': 'text/html',
+    '.css': 'text/css',
+    '.png': 'image/png',
+    '.jpg': 'image/jpg'
+};
 
-const PORT = 80,
-      server = http.createServer((request, response) => {
-    const filePath = (request.url == '/') ? '../Interface/main.html' : '../Interface'+request.url,
-          extname = path.extname(filePath);
-    let contentType = 'text/plain';
-    switch(extname) {
-        case '.html':
-            contentType = 'text/html';
-            break;
-        case '.js':
-            contentType = 'text/javascript';
-            break;
-        case '.css':
-            contentType = 'text/css';
-            break;
-        case '.json':
-            contentType = 'application/json';
-            break;
-        case '.png':
-            contentType = 'image/png';
-            break;
-        case '.jpg':
-            contentType = 'image/jpg';
-            break;
-    }
-
-    fs.readFile(filePath, function(error, content) {
-        if(error) {
-            if(error.code == 'ENOENT')
-                response.writeHead(404);
-            else
-                response.writeHead(500);
-        } else {
-            response.writeHead(200, {
-                'Content-Type': contentType
-            });
-            response.write(content);
-        }
-        response.end();
-    });
-}).on('clientError', (err, socket) => {
-    socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
-}).listen(PORT, () => {
-    console.log(`open http://localhost:${PORT}/ and double click the pane to start`);
+// https://devcenter.heroku.com/articles/ssl-certificate-self
+const server = http2.createSecureServer({
+    'key': fs.readFileSync('localhost.key'),
+    'cert': fs.readFileSync('localhost.crt')
 });
+server.on('stream', (stream, headers) => {
+    console.log('stream', headers);
+    function sendErrorMessage(code) {
+        stream.respond({':status': code});
+        stream.end('ERROR: '+code);
+    }
+    switch(headers[':method']) {
+        case 'GET': {
+            const filePath = (headers[':path'] == '/') ? hostingRoot+'/'+hostingDefault : hostingRoot+headers[':path'];
+            fs.open(filePath, 'r', (error, fd) => {
+                if(error)
+                    sendErrorMessage((error.code == 'ENOENT') ? 404 : 500);
+                else {
+                    const stat = fs.fstatSync(fd);
+                    stream.respondWithFD(fd, {
+                        'last-modified': stat.mtime.toUTCString(),
+                        'content-length': stat.size,
+                        'content-type': contentTypeByExtension[path.extname(filePath)]
+                    });
+                    stream.end();
+                }
+            });
+        } break;
+    }
+});
+server.listen(443);
