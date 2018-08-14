@@ -10,7 +10,7 @@ Plans for a Successor of the PrismCNC
 * Legs / Feet
 * Aluminum Extrusion Profiles:
   * ?x [3030](https://www.aliexpress.com/item/3030-aluminum-extrusion-profile-european-standard-length-100mm-wall-thickness-1-8mm-industrial-aluminum-profile-workbench/32763960938.html)
-  * 2x [30150](https://www.aliexpress.com/item/30150-aluminum-extrusion-profile-european-standard-white-length-600mm-industrial-aluminum-profile-workbench-1pcs/32869356113.html)
+  * 2x 640mm [30150](https://www.aliexpress.com/item/30150-aluminum-extrusion-profile-european-standard-white-length-600mm-industrial-aluminum-profile-workbench-1pcs/32869356113.html)
 * ?x [Connection Plates](https://www.aliexpress.com/item/5-Hole-Angle-Bracket-Joint-Strip-Board-for-Aluminum-Profile-Extrusion-2020-3030/32858453314.html)
 * ?x [Corners](https://www.aliexpress.com/item/10-pcs-3030-2-Hole-Strong-Inside-Corner-Bracket-Gusset-for-3030-Series-Aluminum-Extrusion-Profile/32890800259.html)
 * ?x [Nut Hammer Heads](https://www.aliexpress.com/item/T-Slot-30-m5-30-m4-30-M6-m4-m5-m6-hammer-t-nut-for-aluminum/32849315746.html)
@@ -35,12 +35,14 @@ Plans for a Successor of the PrismCNC
 
 * [ER11 500W Spindle Motor, Clamp, Driver, Transformer](https://www.aliexpress.com/item/500W-ER11-DC-spindle-48V-cnc-Spindle-C00005-for-cnc-router/32808962780.html)
   * Automatic Tool Changer
+* [Additional 55mm Clamp](https://www.aliexpress.com/item/New-CNC-Spindle-Clamp-55mm-diameter-clamp-Mounts-Bracket-With-4-Screws-for-cnc-Milling-Machine/32890454428.html)
 * [Tool Length](https://www.aliexpress.com/item/Factory-selling-CNC-tool-sensor-Cnc-Router-Tool-Setting-Auto-Check-Instrument-CNC-sensor-block-tool/32804279511.html)
 * [Tool Holders](https://www.aliexpress.com/item/1Pcs-ISO20-ER20-Collet-Chuck-holder-30-000RPM-ISO-Spindle-holder-CNC-Mill/32780407049.html)
 * [ER11 Collets](https://www.aliexpress.com/item/13Pcs-ER11-Spring-Collet-Set-for-CNC-Engraving-Machine-milling-Lathe-Tool-VEC11-T0-41/32788738302.html)
 * Coolant
   * [Spray](https://www.aliexpress.com/item/1pc-Mist-Coolant-Lubrication-Spray-System-High-Quality-Mist-Coolant-System-For-8mm-Air-Pipe-CNC/32825718858.html)
   * Pump & Driver
+* 4x [Quick Fixture Clamp](https://www.aliexpress.com/item/NEW-2Pcs-CNC-Fixture-Quick-Clamp-Fixture-Plate-Engraving-Machine-Fastening-Platen-Quick-Clamp-For-Holding/32800658373.html)
 * [Vise](https://www.aliexpress.com/item/QKG50-2-machine-vise-Used-for-surface-grinding-machine-milling-machine-edm-machine-etc/32340735217.html)
 * [Switchable Magnets](https://www.aliexpress.com/item/LISHUAI-On-Off-Magnetic-Base-Holder-Switchable-Neodymium-Magnet-Indicator-Clamp-30kg-50kg-80kg-100kg/32849950877.html)
 
@@ -51,8 +53,6 @@ Plans for a Successor of the PrismCNC
 * 10x [Limit Switch SN04-N 6-36V](https://www.aliexpress.com/item/Inductive-Proximity-Sensor-SN04-N-SN04-N2-SN04-P-SN04-P2-DC-NPN-PNP-NO-NC/32864875404.html)
 * 10x [4 channel logic level converter](https://www.aliexpress.com/item/5PCS-IIC-I2C-Logic-Level-Converter-Bi-Directional-Module-5V-to-3-3V-For-Arduino/32216849765.html)
 * [Opamp for spindle motor driver](https://www.aliexpress.com/item/100PCS-DIP8-IC-UA741CN-UA741CP-UA741-OP-Amp-LM741-741-TI-IC-OPAMP-GP-1MHZ-Free/32389829940.html)
-* [5pin for spindle motor driver](https://www.aliexpress.com/item/10-sets-5-08-2pin-Terminal-plug-type-300V-10A-5-08mm-pitch-connector-pcb-screw/32791916366.html)
-* [10pin for spindle motor driver](https://www.aliexpress.com/item/10sets-Plug-in-terminal-block-KF2EDGK-pitch-3-5MM-2P-3P-4P-10P-Phoenix-terminal-Straight/32808354066.html)
 * 5x 6pin, 1x 3pin [Plugs](https://www.aliexpress.com/item/Free-shipping-Aviation-connector-2PCS-Diam20mm-GX20-12pin-push-pull-circular-quick-connector-5A-400v-Male/32520387627.html)
 * Cables
 * [Red emergency stop button](https://www.aliexpress.com/item/16mm-Metal-brass-Push-Button-Switch-flat-round-illumination-ring-Latching-1NO-1NC-Car-press-button/32676526568.html)
