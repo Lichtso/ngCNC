@@ -24,7 +24,7 @@ Plans for a Successor of the PrismCNC
 * 3 Axis Linear Guide (Workspace: 650mm x 400mm x 250mm)
   * [1000mm x 600mm x 450mm Linear Guide](https://www.aliexpress.com/item/6-sets-linear-rail-SBR16-linear-guide-any-length-linear-bearing-blocks-SFU1605-ball-screw-3/32838832050.html)
   * 2x [FUB16H](https://www.aliexpress.com/item/1-PCS-CNC-aluminum-plate-FUB16H-for-1605-nut-housing-and-SBR16UU/32680540907.html)
-  * 4x [Dust Cover (Bellows)](https://www.aliexpress.com/item/Rectangler-accordion-flexible-bellows-inside-200mm-80mm-outer-230mm-110mm/32711620982.html)
+  * 4x [Dust Cover Bellows (Inner: 110x160, Outer: 170x220, Lengths: 2x 450, 2x 280)](https://www.aliexpress.com/item/Rectangler-accordion-flexible-bellows-inside-200mm-80mm-outer-230mm-110mm/32711620982.html)
   * 2x [Drag Chain (15x20x1000)](https://www.aliexpress.com/item/Free-Shipping-Cable-Chains-15-20-15-30mm-Bridge-Type-Non-Opening-1-Meter-Plastic-Towline/32823055912.html)
   * [Drag Chain (15x30x1000)](https://www.aliexpress.com/item/WSFS-Hot-JFLO-100cm-R38-Semi-Closed-Black-Long-Nylon-Cable-Drag-Chain-Wire-Carrier-15/32772781609.html)
   * 3x [NEMA23 6.35mm Stepper Motors](https://www.aliexpress.com/item/57-Stepper-motor-18-Step-angle-5718HB3-57BYGH-2-3N-m-76MM-length-D-type-M8/32785982717.html)
@@ -37,7 +37,6 @@ Plans for a Successor of the PrismCNC
   * Automatic Tool Changer
 * [Additional 55mm Clamp](https://www.aliexpress.com/item/New-CNC-Spindle-Clamp-55mm-diameter-clamp-Mounts-Bracket-With-4-Screws-for-cnc-Milling-Machine/32890454428.html)
 * [Tool Length](https://www.aliexpress.com/item/Factory-selling-CNC-tool-sensor-Cnc-Router-Tool-Setting-Auto-Check-Instrument-CNC-sensor-block-tool/32804279511.html)
-* [Tool Holders](https://www.aliexpress.com/item/1Pcs-ISO20-ER20-Collet-Chuck-holder-30-000RPM-ISO-Spindle-holder-CNC-Mill/32780407049.html)
 * [ER11 Collets](https://www.aliexpress.com/item/13Pcs-ER11-Spring-Collet-Set-for-CNC-Engraving-Machine-milling-Lathe-Tool-VEC11-T0-41/32788738302.html)
 * Coolant
   * [Spray](https://www.aliexpress.com/item/1pc-Mist-Coolant-Lubrication-Spray-System-High-Quality-Mist-Coolant-System-For-8mm-Air-Pipe-CNC/32825718858.html)
