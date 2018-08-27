@@ -8,13 +8,21 @@ Plans for a Successor of the PrismCNC
   * Stainless Steel Plates
   * [Aluminum Honeycombs with Frame](https://www.aliexpress.com/item/Size-can-be-customized-Honeycomb-Working-Table-300x200mm-Laser-Enquipment-Parts-For-CO2-Laser-Engraver-Cutting/32791623758.html)
 * Legs / Feet
-* Screws
+* Screws:
+  * ?x M5
+  * ?x M6
+* Washers:
+  * ?x M5
+  * ?x M6
+* Nuts:
+  * ?x M5
+  * ?x M6
+  * ?x [M6 Hammer Head](https://www.aliexpress.com/item/100pcs-30-M6-hammer-nut-M5-block-t-slot-nuts-for-3030-aluminum-profile-extrusion-Slot/32688361706.html)
 * Aluminum Extrusion Profiles:
   * ?x [3030](https://www.aliexpress.com/item/3030-aluminum-extrusion-profile-european-standard-length-100mm-wall-thickness-1-8mm-industrial-aluminum-profile-workbench/32763960938.html)
   * 2x 640mm [30150](https://www.aliexpress.com/item/30150-aluminum-extrusion-profile-european-standard-white-length-600mm-industrial-aluminum-profile-workbench-1pcs/32869356113.html)
 * ?x [Connection Plates](https://www.aliexpress.com/item/5-Hole-Angle-Bracket-Joint-Strip-Board-for-Aluminum-Profile-Extrusion-2020-3030/32858453314.html)
 * ?x [Corners](https://www.aliexpress.com/item/10-pcs-3030-2-Hole-Strong-Inside-Corner-Bracket-Gusset-for-3030-Series-Aluminum-Extrusion-Profile/32890800259.html)
-* ?x [Nut Hammer Heads](https://www.aliexpress.com/item/T-Slot-30-m5-30-m4-30-M6-m4-m5-m6-hammer-t-nut-for-aluminum/32849315746.html)
 * Acrylic / Perspex Box (Fish Tank?)
   * With Doors / Hatches
 * Metal Box for Electronics
@@ -30,18 +38,16 @@ Plans for a Successor of the PrismCNC
   * [Drag Chain (15x30x1000)](https://www.aliexpress.com/item/WSFS-Hot-JFLO-100cm-R38-Semi-Closed-Black-Long-Nylon-Cable-Drag-Chain-Wire-Carrier-15/32772781609.html)
   * 3x [NEMA23 6.35mm Stepper Motors](https://www.aliexpress.com/item/57-Stepper-motor-18-Step-angle-5718HB3-57BYGH-2-3N-m-76MM-length-D-type-M8/32785982717.html)
   * 3x [NEMA23 Mount](https://www.aliexpress.com/item/NEMA-23-57-Stepper-Motor-Bracket-Base-Mount-Fixed-Mounting-Seat-for-CNC/32849707675.html)
-* [2 Axis Angular](https://www.aliexpress.com/item/Free-shipping-New-K01-100-Chuck-CNC-4th-axis-5th-axis-A-aixs-rotary-axis-for/2053559551.html)
+* [Angular Axis](https://www.aliexpress.com/item/No-Tax-to-Russia-Rotary-Axis-3-jaw-Chuck-65mm-CNC-4th-axis-harmonic-drive-for/32753254965.html)
 
 ## Milling
 
 * [ER11 500W Spindle Motor, Clamp, Driver, Transformer](https://www.aliexpress.com/item/500W-ER11-DC-spindle-48V-cnc-Spindle-C00005-for-cnc-router/32808962780.html)
-* [Additional 55mm Clamp](https://www.aliexpress.com/item/New-CNC-Spindle-Clamp-55mm-diameter-clamp-Mounts-Bracket-With-4-Screws-for-cnc-Milling-Machine/32890454428.html)
 * [Tool Length](https://www.aliexpress.com/item/Factory-selling-CNC-tool-sensor-Cnc-Router-Tool-Setting-Auto-Check-Instrument-CNC-sensor-block-tool/32804279511.html)
 * [ER11 Collets](https://www.aliexpress.com/item/13Pcs-ER11-Spring-Collet-Set-for-CNC-Engraving-Machine-milling-Lathe-Tool-VEC11-T0-41/32788738302.html)
 * [Coolant Spray](https://www.aliexpress.com/item/1pc-Mist-Coolant-Lubrication-Spray-System-High-Quality-Mist-Coolant-System-For-8mm-Air-Pipe-CNC/32825718858.html)
 * [Air Pump / Compressor](https://www.aliexpress.com/item/ship-from-Netherlands-warehouse-airbrush-fengda-FD-196K-oil-free-mini-air-compressor-ink-body-paint/32831656165.html)
 * 4x [Quick Fixture Clamp](https://www.aliexpress.com/item/NEW-2Pcs-CNC-Fixture-Quick-Clamp-Fixture-Plate-Engraving-Machine-Fastening-Platen-Quick-Clamp-For-Holding/32800658373.html)
-* [Vise](https://www.aliexpress.com/item/QKG50-2-machine-vise-Used-for-surface-grinding-machine-milling-machine-edm-machine-etc/32340735217.html)
 * [Switchable Magnets](https://www.aliexpress.com/item/LISHUAI-On-Off-Magnetic-Base-Holder-Switchable-Neodymium-Magnet-Indicator-Clamp-30kg-50kg-80kg-100kg/32849950877.html)
 
 ## Electronics
