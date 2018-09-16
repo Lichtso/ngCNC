@@ -1,7 +1,7 @@
 const fs = require('fs'),
       path = require('path'),
       http2 = require('http2'),
-      hostingRoot = '../Interface',
+      hostingRoot = '../UserInterface',
       hostingDefault = 'main.html',
       contentTypeByExtension = {
     '.txt': 'text/plain',
