@@ -1,4 +1,4 @@
-#include "FeedrateManager.h"
+#include "LimitSwitch.h"
 
 const uint8_t coolantPin = 44, illuminationPin = 45;
 const uint32_t statusReportInterval = 1000000*0.25F;
@@ -81,6 +81,7 @@ bool parseCommand() {
         if(!parseTarget())
             return false;
         lineInterpolator.begin();
+        feedrateManager.enterSegment();
     } else if(strcmp(token, "Helix") == 0) {
         if(feedrateManager.interpolator)
             return false;
@@ -90,6 +91,7 @@ bool parseCommand() {
             return false;
         // TODO: helixInterpolator.axis[], helixInterpolator.center[]
         helixInterpolator.begin();
+        feedrateManager.enterSegment();
     } else if(strcmp(token, "Stop") == 0)
         feedrateManager.stop();
     else if(strcmp(token, "Spindle") == 0) {
@@ -137,7 +139,7 @@ void loop() {
     uint32_t currentLoopIteration = micros();
     float seconds = (currentLoopIteration-lastLoopIteration)/1000000.0;
     lastLoopIteration = currentLoopIteration;
-    
+
     while(SerialUSB.available() > 0) {
         buffer[bufferIndex++] = SerialUSB.read();
         if(buffer[bufferIndex-1] == '\n') {
@@ -151,7 +153,7 @@ void loop() {
     }
 
     spindleMotorDriver.loop(currentLoopIteration);
-    feedrateManager.loop(currentLoopIteration, seconds);
+    feedrateManager.loop(seconds);
 
     if(currentLoopIteration-lastStatusReport > statusReportInterval) {
       lastStatusReport = currentLoopIteration;

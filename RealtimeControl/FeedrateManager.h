@@ -15,12 +15,16 @@ struct FeedrateManager {
           currentFeedrate;
 
     void setup() {
-        interpolator = &lineInterpolator;
         pinMode(buttonPin, INPUT);
         attachInterrupt(digitalPinToInterrupt(buttonPin), ButtonPressedISR, RISING);
+        NVIC_EnableIRQ(TC3_IRQn);
+        pmc_set_writeprotect(false);
+        pmc_enable_periph_clk(TC3_IRQn);
+        TC_Configure(TC1, 0, TC_CMR_WAVE | TC_CMR_WAVSEL_UP_RC | TC_CMR_TCCLKS_TIMER_CLOCK4);
+        TC1->TC_CHANNEL[0].TC_IER = TC_IER_CPCS;
     }
 
-    void loop(uint32_t currentLoopIteration, float seconds) {
+    void loop(float seconds) {
         if(!interpolator)
             return;
         float slowDownTime = (targetFeedrate-endFeedrate)/maximumAccelleration,
@@ -31,33 +35,44 @@ struct FeedrateManager {
             float accelleration = fmax(-maximumAccelleration*seconds, fmin(targetFeedrate-currentFeedrate, maximumAccelleration*seconds));
             currentFeedrate = fmax(minimumFeedrate, currentFeedrate+accelleration);
         }
-        (interpolator->*interpolate)();
-        uint32_t microseconds = sqrt(stepperMotorDriver.stepAccumulator)/currentFeedrate*1000000.0F,
-                 risingTime = micros(),
-                 overdue = risingTime-currentLoopIteration;
-        if(overdue < microseconds)
-            microseconds -= overdue;
-        microseconds /= 2;
-        delayMicroseconds(microseconds);
-        if(interpolator->progress < 1.0F) {
-            stepperMotorDriver.resetStepSignals();
-            overdue = micros()-risingTime-microseconds;
-            if(overdue < microseconds)
-                microseconds -= overdue;
-            delayMicroseconds(microseconds);
-        } else
-            stop();
     }
 
-    void stop() {
-        targetFeedrate = currentFeedrate = 0.0F;
+    void intervalHandler() {
+        (interpolator->*interpolate)();
+        TC_SetRC(TC1, 0, sqrt(stepperMotorDriver.stepAccumulator)/currentFeedrate*(VARIANT_MCK/128)); // TC_CMR_TCCLKS_TIMER_CLOCK4 = 128
+        stepperMotorDriver.resetStepSignals();
+        if(interpolator->progress == 1.0F)
+            exitSegment();
+    }
+
+    void enterSegment() {
+        currentFeedrate = minimumFeedrate;
+        intervalHandler();
+        TC_Start(TC1, 0);
+    }
+
+    void exitSegment() {
+        TC_Stop(TC1, 0);
+        targetFeedrate = endFeedrate = currentFeedrate = 0.0F;
         interpolator = NULL;
         interpolate = NULL;
         stepperMotorDriver.resetStepSignals();
+    }
+
+    void stop() {
+        SerialUSB.println("STOP triggered");
+        exitSegment();
     }
 };
 FeedrateManager feedrateManager;
 
 void ButtonPressedISR() {
     feedrateManager.stop();
+}
+
+void TC3_Handler() {
+    NVIC_DisableIRQ(TC3_IRQn);
+    TC_GetStatus(TC1, 0);
+    feedrateManager.intervalHandler();
+    NVIC_EnableIRQ(TC3_IRQn);
 }

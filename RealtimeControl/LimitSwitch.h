@@ -1,4 +1,4 @@
-#include "MotorDriver.h"
+#include "FeedrateManager.h"
 
 void LowerLimitISR();
 void UpperLimitISR();
@@ -22,13 +22,13 @@ LimitSwitch limitSwitch;
 void LowerLimitISR() {
     for(uint8_t i = 0; i < limitSwitch.dimensions; ++i)
         if(digitalRead(limitSwitch.lowerEndPin[i])) {
-            // TODO
+            feedrateManager.stop(); // TODO
         }
 }
 
 void UpperLimitISR() {
     for(uint8_t i = 0; i < limitSwitch.dimensions; ++i)
         if(digitalRead(limitSwitch.upperEndPin[i])) {
-            // TODO
+            feedrateManager.stop(); // TODO
         }
 }
