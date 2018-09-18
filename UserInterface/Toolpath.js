@@ -1,19 +1,19 @@
-import {vec3, mat3} from './gl-matrix.js';
+import {vec3} from './gl-matrix.js';
 import {gl, createShader, createProgram} from './Webgl.js';
 
 const program = createProgram(gl, createShader(gl, gl.VERTEX_SHADER, `
 uniform mat4 transform;
 attribute vec4 position;
-varying vec3 color;
+varying float time;
 
 void main() {
     gl_Position = transform*vec4(position.xyz, 1.0);
-    color = vec3(1.0);
+    time = position.w;
 }`), createShader(gl, gl.FRAGMENT_SHADER, `
-varying vec3 color;
+varying float time;
 
 void main() {
-    gl_FragColor.rgb = color;
+    gl_FragColor.rgb = vec3((mod(time, 1.0) < 0.5) ? 0.5 : 1.0);
     gl_FragColor.a = 1.0;
 }`));
 
@@ -31,55 +31,31 @@ export class Toolpath {
         positions.push(time);
         this.vertices = 1;
         for(const operation of operations) {
-            let length = 0.0;
             switch(operation.type) {
-                case 'Line':
-                    length = vec3.distance(linearPosition, operation.linearPosition);
+                case 'Line': {
                     for(let i = 0; i < 3; ++i)
                         positions.push(operation.linearPosition[i]);
-                    positions.push(time+length/operation.feedrate);
+                    positions.push(time+operation.length/operation.feedrate);
                     ++this.vertices;
-                    break;
+                } break;
                 case 'Helix': {
-                    const startVec = vec3.create(), endVec = vec3.create(),
-                          normal = vec3.create(), aux = vec3.create(), orientation = mat3.create();
-                    vec3.sub(startVec, linearPosition, operation.helixCenter);
-                    vec3.sub(endVec, operation.linearPosition, operation.helixCenter);
-                    const startHeight = vec3.dot(startVec, operation.helixAxis),
-                          endHeight = vec3.dot(endVec, operation.helixAxis);
-                    vec3.scale(aux, operation.helixAxis, startHeight);
-                    vec3.sub(startVec, startVec, aux);
-                    const radius = vec3.length(startVec);
-                    vec3.normalize(startVec, startVec);
-                    vec3.scale(aux, operation.helixAxis, endHeight);
-                    vec3.sub(endVec, endVec, aux);
-                    vec3.normalize(endVec, endVec);
-                    vec3.cross(normal, startVec, operation.helixAxis);
-                    vec3.normalize(normal, normal);
-                    mat3.set(orientation, startVec[0], startVec[1], startVec[2], normal[0], normal[1], normal[2], operation.helixAxis[0], operation.helixAxis[1], operation.helixAxis[2]);
-                    let angle = Math.acos(vec3.dot(startVec, endVec));
-                    if(angle == 0)
-                        angle = Math.PI*2.0;
-                    else if(vec3.dot(normal, endVec) < 0)
-                        angle = Math.PI*2.0-angle;
-                    const slope = (endHeight-startHeight)/angle;
-                    length = Math.sqrt(radius*radius+slope*slope);
-                    const vertexCount = Math.ceil(angle/this.arcPrecision);
+                    const angleSlope = (operation.helixExitHeight-operation.helixEntryHeight)/operation.helixAngle,
+                          angleLength = Math.hypot(operation.helixRadius, angleSlope),
+                          position = vec3.create(),
+                          vertexCount = Math.ceil(operation.helixAngle/this.arcPrecision);
                     for(let j = 1; j <= vertexCount; ++j) {
-                        const t = j/vertexCount*angle;
-                        vec3.set(aux, radius*Math.cos(t), radius*Math.sin(t), startHeight+slope*t);
-                        vec3.transformMat3(aux, aux, orientation);
-                        vec3.add(aux, aux, operation.helixCenter);
+                        const t = j/vertexCount*operation.helixAngle;
+                        vec3.set(position, operation.helixRadius*Math.cos(t), operation.helixRadius*Math.sin(t), operation.helixEntryHeight+angleSlope*t);
+                        vec3.transformMat4(position, position, operation.transformation);
                         for(let i = 0; i < 3; ++i)
-                            positions.push(aux[i]);
-                        positions.push(time+t*length);
+                            positions.push(position[i]);
+                        positions.push(time+t*angleLength);
                         ++this.vertices;
                     }
-                    length *= angle;
                 } break;
             }
             if(operation.linearPosition) {
-                time += length/operation.feedrate;
+                time += operation.length/operation.feedrate;
                 linearPosition = operation.linearPosition;
                 angularPosition = operation.angularPosition;
             }
@@ -98,6 +74,6 @@ export class Toolpath {
         gl.enableVertexAttribArray(0);
         gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
         gl.vertexAttribPointer(0, 4, gl.FLOAT, false, 0, 0);
-        gl.drawArrays(gl.LINE_STRIP, 0, this.vertices); // TODO: Visualize normal: gl.TRIANGLE_STRIP
+        gl.drawArrays(gl.LINE_STRIP, 0, this.vertices);
     }
 }

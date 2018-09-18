@@ -1,4 +1,4 @@
-import {vec3} from './gl-matrix.js';
+import {vec3, mat4} from './gl-matrix.js';
 
 export class GCode {
     constructor(input) {
@@ -13,14 +13,17 @@ export class GCode {
         this.helixCenter = vec3.create();
         this.linearPosition = vec3.create();
         this.angularPosition = vec3.create();
+        this.prevTangent = vec3.create();
         this.prevLinearPosition = vec3.create();
         this.prevAngularPosition = vec3.create();
         this.interpolationMode = 'line';
         this.positionMode = 'absolute';
-        for(const line of input.split('\n')) {
+        for(let line of input.split('\n')) {
+            const commentIndex = Math.max(line.indexOf(';'), line.indexOf('('));
+            if(commentIndex >= 0)
+                line = line.substr(0, commentIndex);
             let usedAddress = false;
-            const commands = line.split(' ');
-            for(const command of commands) {
+            for(const command of line.split(' ')) {
                 const value = parseFloat(command.substr(1));
                 switch(command[0]) {
                     // Not implemented: D E H L N O P Q R T U V W
@@ -113,6 +116,9 @@ export class GCode {
             case 100:
                 // this.operations.push({'type': 'ToolLengthMeasurement'}); // TODO
                 break;
+            default:
+                this.interpolationMode = undefined;
+                break;
         }
     }
 
@@ -147,28 +153,70 @@ export class GCode {
             'linearPosition': vec3.clone(this.linearPosition),
             'angularPosition': vec3.clone(this.angularPosition)
         };
-        if(this.interpolationMode == 'Helix') {
-            segment.helixAxis = [
-                vec3.fromValues(this.helixDirection, 0, 0),
-                vec3.fromValues(0, this.helixDirection, 0),
-                vec3.fromValues(0, 0, this.helixDirection)
-            ][this.helixAxis];
-            segment.helixCenter = vec3.create();
-            if(this.helixRadius != 0.0) {
-                const tangent = vec3.create(), normal = vec3.create();
-                vec3.sub(tangent, this.linearPosition, this.prevLinearPosition);
-                vec3.scale(normal, segment.helixAxis, vec3.dot(tangent, segment.helixAxis));
-                vec3.sub(tangent, tangent, normal);
-                vec3.cross(normal, tangent, segment.helixAxis);
-                vec3.normalize(normal, normal);
-                const factor = Math.sqrt(this.helixRadius*this.helixRadius-vec3.squaredLength(tangent)*0.25);
-                vec3.scale(normal, normal, (this.helixRadius < 0) ? -factor : factor);
-                vec3.scale(tangent, tangent, 0.5);
-                vec3.add(this.helixCenter, tangent, normal);
-            }
-            vec3.add(segment.helixCenter, this.prevLinearPosition, this.helixCenter);
+        const diffVec = vec3.create();
+        vec3.sub(diffVec, this.linearPosition, this.prevLinearPosition);
+        switch(this.interpolationMode) {
+            case 'Line': {
+                segment.length = vec3.length(diffVec);
+                segment.entryTangent = segment.exitTangent = vec3.create();
+                vec3.scale(segment.exitTangent, diffVec, 1.0/segment.length);
+            } break;
+            case 'Helix': {
+                segment.helixCenter = vec3.create();
+                segment.helixAxis = vec3.create();
+                segment.helixAxis[this.helixAxis] = this.helixDirection;
+                if(this.helixRadius != 0.0) {
+                    vec3.scaleAndAdd(diffVec, diffVec, segment.helixAxis, -vec3.dot(diffVec, segment.helixAxis));
+                    const sidewaysDistance = Math.sqrt(this.helixRadius*this.helixRadius-vec3.squaredLength(diffVec)*0.25),
+                          sideways = vec3.create();
+                    vec3.cross(sideways, diffVec, segment.helixAxis);
+                    vec3.normalize(sideways, sideways);
+                    vec3.scale(sideways, sideways, (this.helixRadius < 0) ? -sidewaysDistance : sidewaysDistance);
+                    vec3.scaleAndAdd(this.helixCenter, sideways, diffVec, 0.5);
+                }
+                vec3.add(segment.helixCenter, this.prevLinearPosition, this.helixCenter);
+                const entryVec = vec3.create(),
+                      exitVec = vec3.create();
+                vec3.sub(entryVec, this.prevLinearPosition, segment.helixCenter);
+                vec3.sub(exitVec, this.linearPosition, segment.helixCenter);
+                segment.helixEntryHeight = vec3.dot(entryVec, segment.helixAxis);
+                segment.helixExitHeight = vec3.dot(exitVec, segment.helixAxis);
+                vec3.scaleAndAdd(entryVec, entryVec, segment.helixAxis, -segment.helixEntryHeight);
+                vec3.scaleAndAdd(exitVec, exitVec, segment.helixAxis, -segment.helixExitHeight);
+                segment.helixRadius = vec3.length(entryVec);
+                vec3.normalize(entryVec, entryVec);
+                vec3.normalize(exitVec, exitVec);
+                segment.entryTangent = vec3.create();
+                segment.exitTangent = vec3.create();
+                vec3.cross(segment.entryTangent, entryVec, segment.helixAxis);
+                vec3.cross(segment.exitTangent, exitVec, segment.helixAxis);
+                vec3.normalize(segment.entryTangent, segment.entryTangent);
+                vec3.normalize(segment.exitTangent, segment.exitTangent);
+                segment.transformation = mat4.fromValues(
+                    entryVec[0], entryVec[1], entryVec[2], 0,
+                    segment.entryTangent[0], segment.entryTangent[1], segment.entryTangent[2], 0,
+                    segment.helixAxis[0], segment.helixAxis[1], segment.helixAxis[2], 0,
+                    segment.helixCenter[0], segment.helixCenter[1], segment.helixCenter[2], 0
+                );
+                segment.helixAngle = Math.acos(vec3.dot(entryVec, exitVec));
+                if(segment.helixAngle == 0)
+                    segment.helixAngle = Math.PI*2.0;
+                else if(vec3.dot(segment.entryTangent, exitVec) < 0)
+                    segment.helixAngle = Math.PI*2.0-segment.helixAngle;
+                segment.length = Math.hypot(segment.helixRadius*segment.helixAngle, segment.helixExitHeight-segment.helixEntryHeight);
+                const aux = vec3.create();
+                vec3.scale(aux, segment.helixAxis, (segment.helixExitHeight-segment.helixEntryHeight)/segment.length);
+                vec3.add(segment.entryTangent, segment.entryTangent, aux);
+                vec3.add(segment.exitTangent, segment.exitTangent, aux);
+                vec3.normalize(segment.entryTangent, segment.entryTangent);
+                vec3.normalize(segment.exitTangent, segment.exitTangent);
+            } break;
+            default:
+                return;
         }
+        segment.entrySpeedFactor = Math.max(0.0, vec3.dot(this.prevTangent, segment.entryTangent));
         this.operations.push(segment);
+        vec3.copy(this.prevTangent, segment.exitTangent);
         vec3.copy(this.prevLinearPosition, this.linearPosition);
         vec3.copy(this.prevAngularPosition, this.angularPosition);
         vec3.set(this.helixCenter, 0.0, 0.0, 0.0);
