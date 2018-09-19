@@ -1,5 +1,7 @@
 #include "Interpolation.h"
 
+uint32_t lastLoopIteration, lastStatusReport;
+void statusReport();
 void ButtonPressedISR();
 
 struct FeedrateManager {
@@ -57,6 +59,7 @@ struct FeedrateManager {
         interpolator = NULL;
         interpolate = NULL;
         stepperMotorDriver.resetStepSignals();
+        statusReport();
     }
 
     void stop() {
@@ -65,6 +68,21 @@ struct FeedrateManager {
     }
 };
 FeedrateManager feedrateManager;
+
+void statusReport() {
+    lastStatusReport = micros();
+    SerialUSB.print(lastStatusReport/1000000.0);
+    SerialUSB.print(' ');
+    for(uint8_t i = 0; i < AXIS_COUNT; ++i) {
+        SerialUSB.print(stepperMotorDriver.current[i]);
+        SerialUSB.print(' ');
+    }
+    SerialUSB.print(feedrateManager.interpolator->progress);
+    SerialUSB.print(' ');
+    SerialUSB.print(feedrateManager.currentFeedrate);
+    SerialUSB.print(' ');
+    SerialUSB.println(spindleMotorDriver.speed);
+}
 
 void ButtonPressedISR() {
     feedrateManager.stop();

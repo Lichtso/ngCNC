@@ -52,7 +52,7 @@ void TurnISR();
 void AlertISR();
 
 struct SpindleMotorDriver {
-    uint8_t enablePin, directionPin, turnPin, alertPin, speedPin;
+    uint8_t enablePin, turnPin, alertPin, speedPin, directionPin;
     volatile uint32_t prevTurn, currentTurn;
     uint16_t voltage;
     float speed, targetSpeed, maximumSpeed;
@@ -60,10 +60,10 @@ struct SpindleMotorDriver {
     void setup() {
         setEnable(false);
         pinMode(enablePin, OUTPUT);
-        pinMode(directionPin, OUTPUT);
         pinMode(turnPin, INPUT);
         pinMode(alertPin, INPUT);
         pinMode(speedPin, OUTPUT);
+        pinMode(directionPin, OUTPUT);
         analogWriteResolution(12);
         attachInterrupt(digitalPinToInterrupt(turnPin), TurnISR, RISING);
         attachInterrupt(digitalPinToInterrupt(alertPin), AlertISR, RISING);

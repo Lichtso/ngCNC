@@ -2,7 +2,6 @@
 
 const uint8_t coolantPin = 44, illuminationPin = 45;
 const uint32_t statusReportInterval = 1000000*0.25F;
-uint32_t lastLoopIteration, lastStatusReport;
 
 void setup() {
     // REG_PIOx_OWER, REG_PIOx_OWDR
@@ -10,7 +9,7 @@ void setup() {
     pinMode(coolantPin, OUTPUT);
     pinMode(illuminationPin, OUTPUT);
 
-    uint8_t motorDriverPins[] = { 22, 23, 28, 29, 34 };
+    uint8_t motorDriverPins[] = { 42, 48, 37, 43, 49 };
     for(uint8_t i = 0; i < AXIS_COUNT; ++i) {
         stepperMotorDriver.stepSize[i] = 5.0/6400; // 5mm per revolution, 200*32 steps per revolution
         stepperMotorDriver.enablePin[i] = motorDriverPins[i];
@@ -22,11 +21,11 @@ void setup() {
     stepperMotorDriver.setup();
     limitSwitch.setup();
 
-    spindleMotorDriver.enablePin = 35;
-    spindleMotorDriver.directionPin = 37;
-    spindleMotorDriver.turnPin = 39;
-    spindleMotorDriver.alertPin = 41;
+    spindleMotorDriver.enablePin = 34;
+    spindleMotorDriver.turnPin = 36;
+    spindleMotorDriver.alertPin = 38;
     spindleMotorDriver.speedPin = DAC0;
+    spindleMotorDriver.directionPin = 40;
     spindleMotorDriver.maximumSpeed = 200.0F; // 200 Hz or 12000 rpm
     spindleMotorDriver.setup();
 
@@ -155,18 +154,6 @@ void loop() {
     spindleMotorDriver.loop(currentLoopIteration);
     feedrateManager.loop(seconds);
 
-    if(currentLoopIteration-lastStatusReport > statusReportInterval) {
-      lastStatusReport = currentLoopIteration;
-      SerialUSB.print(currentLoopIteration/1000000.0);
-      SerialUSB.print(' ');
-      for(uint8_t i = 0; i < AXIS_COUNT; ++i) {
-        SerialUSB.print(stepperMotorDriver.current[i]);
-        SerialUSB.print(' ');
-      }
-      SerialUSB.print(feedrateManager.interpolator->progress);
-      SerialUSB.print(' ');
-      SerialUSB.print(feedrateManager.currentFeedrate);
-      SerialUSB.print(' ');
-      SerialUSB.println(spindleMotorDriver.speed);
-    }
+    if(currentLoopIteration-lastStatusReport > statusReportInterval)
+        statusReport();
 }
