@@ -1,5 +1,12 @@
 #include <Arduino.h>
+
 #define AXIS_COUNT 5
+uint32_t lastLoopIteration, lastStatusReport;
+
+void statusReport();
+void emergencyStop();
+
+
 
 struct StepperMotorDriver {
     static const uint8_t dimensions = AXIS_COUNT;
@@ -49,7 +56,10 @@ StepperMotorDriver stepperMotorDriver;
 
 
 void TurnISR();
-void AlertISR();
+void AlertISR() {
+    emergencyStop();
+    SerialUSB.println("ERROR: Emergency Stop - Spindle Motor");
+}
 
 struct SpindleMotorDriver {
     uint8_t enablePin, turnPin, alertPin, speedPin, directionPin;
@@ -83,9 +93,9 @@ struct SpindleMotorDriver {
         digitalWrite(enablePin, !enable);
     }
 
-    void loop(uint32_t currentLoopIteration) {
+    void loop() {
         speed = (currentTurn-prevTurn < 1000) ? 0.0F : 1000000.0F/(currentTurn-prevTurn);
-        prevTurn = currentTurn = currentLoopIteration;
+        prevTurn = currentTurn = lastLoopIteration;
         // TODO: Speed control
     }
 };
@@ -94,8 +104,4 @@ SpindleMotorDriver spindleMotorDriver;
 void TurnISR() {
     spindleMotorDriver.prevTurn = spindleMotorDriver.currentTurn;
     spindleMotorDriver.currentTurn = micros();
-}
-
-void AlertISR() {
-    // TODO
 }

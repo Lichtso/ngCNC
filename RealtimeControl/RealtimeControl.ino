@@ -1,7 +1,7 @@
 #include "LimitSwitch.h"
 
 const uint8_t coolantPin = 44, illuminationPin = 45;
-const uint32_t statusReportInterval = 1000000*0.25F;
+const float statusReportInterval = 1000000.0F/4; // 1/4 seconds
 
 void setup() {
     // REG_PIOx_OWER, REG_PIOx_OWDR
@@ -29,14 +29,15 @@ void setup() {
     spindleMotorDriver.maximumSpeed = 200.0F; // 200 Hz or 12000 rpm
     spindleMotorDriver.setup();
 
-    feedrateManager.buttonPin = 43;
+    feedrateManager.stopButtonPin = 43;
     feedrateManager.maximumAccelleration = 1.0F;
-    feedrateManager.minimumFeedrate = 0.1F;
+    feedrateManager.minimumFeedrate = 0.01F;
     feedrateManager.maximumFeedrate = 5.0F;
     feedrateManager.setup();
 
     SerialUSB.begin(115200);
-    lastLoopIteration = lastStatusReport = micros();
+    lastStatusReport = 0;
+    lastLoopIteration = micros();
 }
 
 char buffer[128], *token, *tokenEnd;
@@ -54,11 +55,11 @@ bool parseTarget() {
     if(!nextToken())
             return false;
     sscanf(token, "%f", &feedrateManager.targetFeedrate);
-    feedrateManager.targetFeedrate = fmax(feedrateManager.minimumFeedrate, fmin(feedrateManager.targetFeedrate, feedrateManager.maximumFeedrate));
+    feedrateManager.targetFeedrate = fmax(0.0F, fmin(feedrateManager.targetFeedrate, feedrateManager.maximumFeedrate));
     if(!nextToken())
             return false;
     sscanf(token, "%f", &feedrateManager.endFeedrate);
-    feedrateManager.endFeedrate = fmax(feedrateManager.minimumFeedrate, fmin(feedrateManager.endFeedrate, feedrateManager.maximumFeedrate));
+    feedrateManager.endFeedrate = fmax(0.0F, fmin(feedrateManager.endFeedrate, feedrateManager.maximumFeedrate));
     for(uint8_t i = 0; i < AXIS_COUNT; ++i) {
         if(!nextToken())
             return false;
@@ -91,8 +92,10 @@ bool parseCommand() {
         // TODO: helixInterpolator.axis[], helixInterpolator.center[]
         helixInterpolator.begin();
         feedrateManager.enterSegment();
-    } else if(strcmp(token, "Stop") == 0)
-        feedrateManager.stop();
+    } else if(strcmp(token, "SoftStop") == 0)
+        feedrateManager.targetFeedrate = feedrateManager.endFeedrate = 0.0F;
+    else if(strcmp(token, "HardStop") == 0)
+        feedrateManager.exitSegment();
     else if(strcmp(token, "Spindle") == 0) {
         if(!nextToken())
             return false;
@@ -151,9 +154,11 @@ void loop() {
         }
     }
 
-    spindleMotorDriver.loop(currentLoopIteration);
+    spindleMotorDriver.loop();
     feedrateManager.loop(seconds);
 
-    if(currentLoopIteration-lastStatusReport > statusReportInterval)
+    if(currentLoopIteration-lastStatusReport > statusReportInterval) {
+        lastStatusReport = floor(currentLoopIteration/statusReportInterval)*statusReportInterval;
         statusReport();
+    }
 }

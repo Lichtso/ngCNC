@@ -1,14 +1,12 @@
 #include "Interpolation.h"
 
-uint32_t lastLoopIteration, lastStatusReport;
-void statusReport();
-void ButtonPressedISR();
+void StopButtonISR();
 
 struct FeedrateManager {
     typedef void (Interpolator::*Interpolate)();
     Interpolator* interpolator;
     Interpolate interpolate;
-    uint8_t buttonPin;
+    uint8_t stopButtonPin;
     float maximumAccelleration,
           minimumFeedrate,
           maximumFeedrate,
@@ -17,8 +15,8 @@ struct FeedrateManager {
           currentFeedrate;
 
     void setup() {
-        pinMode(buttonPin, INPUT);
-        attachInterrupt(digitalPinToInterrupt(buttonPin), ButtonPressedISR, RISING);
+        pinMode(stopButtonPin, INPUT);
+        attachInterrupt(digitalPinToInterrupt(stopButtonPin), StopButtonISR, RISING);
         NVIC_EnableIRQ(TC3_IRQn);
         pmc_set_writeprotect(false);
         pmc_enable_periph_clk(TC3_IRQn);
@@ -29,49 +27,62 @@ struct FeedrateManager {
     void loop(float seconds) {
         if(!interpolator)
             return;
+        NVIC_DisableIRQ(TC3_IRQn);
         float slowDownTime = (targetFeedrate-endFeedrate)/maximumAccelleration,
-              slowDownDistance = (currentFeedrate-maximumAccelleration*slowDownTime*0.5)*slowDownTime;
-        if(slowDownTime > 0.0F && (1.0F-interpolator->progress)*interpolator->distance <= slowDownDistance)
-            targetFeedrate = endFeedrate;
+              slowDownDistance = (currentFeedrate-maximumAccelleration*slowDownTime*0.5)*slowDownTime,
+              distanceLeft = (1.0F-interpolator->progress)*interpolator->distance;
+        if(slowDownTime > 0.0F && distanceLeft <= slowDownDistance)
+            targetFeedrate = distanceLeft/slowDownTime;
         if(currentFeedrate != targetFeedrate) {
             float accelleration = fmax(-maximumAccelleration*seconds, fmin(targetFeedrate-currentFeedrate, maximumAccelleration*seconds));
-            currentFeedrate = fmax(minimumFeedrate, currentFeedrate+accelleration);
+            currentFeedrate = currentFeedrate+accelleration;
         }
+        NVIC_EnableIRQ(TC3_IRQn);
     }
 
     void intervalHandler() {
         (interpolator->*interpolate)();
-        TC_SetRC(TC1, 0, sqrt(stepperMotorDriver.stepAccumulator)/currentFeedrate*(VARIANT_MCK/128)); // TC_CMR_TCCLKS_TIMER_CLOCK4 = 128
-        stepperMotorDriver.resetStepSignals();
-        if(interpolator->progress == 1.0F)
+        TC_SetRC(TC1, 0, sqrt(stepperMotorDriver.stepAccumulator)/fmax(minimumFeedrate, currentFeedrate)*(VARIANT_MCK/128)); // TC_CMR_TCCLKS_TIMER_CLOCK4 = 128
+        if(interpolator->progress == 1.0F || (targetFeedrate == 0.0F && currentFeedrate == 0.0F))
             exitSegment();
+        else
+            stepperMotorDriver.resetStepSignals();
     }
 
     void enterSegment() {
-        currentFeedrate = minimumFeedrate;
         intervalHandler();
         TC_Start(TC1, 0);
     }
 
     void exitSegment() {
         TC_Stop(TC1, 0);
-        targetFeedrate = endFeedrate = currentFeedrate = 0.0F;
         interpolator = NULL;
         interpolate = NULL;
+        targetFeedrate = endFeedrate = 0.0F;
         stepperMotorDriver.resetStepSignals();
-        statusReport();
-    }
-
-    void stop() {
-        SerialUSB.println("STOP triggered");
-        exitSegment();
+        lastStatusReport = 0;
     }
 };
 FeedrateManager feedrateManager;
 
+void StopButtonISR() {
+    emergencyStop();
+    SerialUSB.println("ERROR: Emergency Stop - Button");
+}
+
+void TC3_Handler() {
+    feedrateManager.intervalHandler();
+    TC_GetStatus(TC1, 0);
+}
+
+
+
+void emergencyStop() {
+    feedrateManager.exitSegment();
+}
+
 void statusReport() {
-    lastStatusReport = micros();
-    SerialUSB.print(lastStatusReport/1000000.0);
+    SerialUSB.print(lastLoopIteration/1000000.0);
     SerialUSB.print(' ');
     for(uint8_t i = 0; i < AXIS_COUNT; ++i) {
         SerialUSB.print(stepperMotorDriver.current[i]);
@@ -82,15 +93,4 @@ void statusReport() {
     SerialUSB.print(feedrateManager.currentFeedrate);
     SerialUSB.print(' ');
     SerialUSB.println(spindleMotorDriver.speed);
-}
-
-void ButtonPressedISR() {
-    feedrateManager.stop();
-}
-
-void TC3_Handler() {
-    NVIC_DisableIRQ(TC3_IRQn);
-    TC_GetStatus(TC1, 0);
-    feedrateManager.intervalHandler();
-    NVIC_EnableIRQ(TC3_IRQn);
 }

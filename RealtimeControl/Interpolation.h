@@ -34,9 +34,11 @@ struct LineInterpolator : public Interpolator {
     }
 
     void interpolate() {
+        if(end[longestAxis] == stepperMotorDriver.current[longestAxis]) {
+           progress = 1.0F;
+           return;
+        }
         progress = 1.0F-fabs(end[longestAxis]-stepperMotorDriver.current[longestAxis])/diff[longestAxis];
-        if(end[longestAxis] == stepperMotorDriver.current[longestAxis])
-            return;
         for(uint8_t i = 0; i < AXIS_COUNT; ++i) {
             error[i] -= diff[i];
             if(error[i] < 0) {
