@@ -1,6 +1,15 @@
 {
   "name": "ngCNC",
+  "version": "0.0.0-semantic-release",
+  "description": "high level interface to ngCNC",
   "dependencies": {
-    "gamepad": "^1.6.0"
+    "gamepad": "^1.6.0",
+    "koa": "^2.6.2",
+    "koa-static": "^5.0.0"
+  },
+  "pacman": {
+    "services": {
+      "ngCNC": "systemd/ngCNC*"
+    }
   }
 }

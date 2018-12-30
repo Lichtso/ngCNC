@@ -1,13 +1,13 @@
 [Unit]
-Description=ngcnc %H-%i
+Description=high level interface to ngCNC
 Requires=network-online.target
 After=network-online.target
 [Service]
 Restart=on-failure
 RestartSec=5000ms
 User=root
-WorkingDirectory=/var/ngcnc
-ExecStart=/srv/kronos/bin/ngcnc
+WorkingDirectory=/var/ngCNC
+ExecStart=/services/ngCNC/bin/ngCNC
 ExecReload=/bin/kill -HUP $MAINPID
 KillSignal=SIGINT
 [Install]
