@@ -1,5 +1,5 @@
 [Unit]
-Description=high level interface to ngCNC
+Description=ngCNC web app host
 Requires=network-online.target
 After=network-online.target
 [Service]

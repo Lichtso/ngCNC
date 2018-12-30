@@ -1,7 +1,5 @@
-const gamepad = require("gamepad");
-
-
-const fs = require('fs'),
+const gamepad = require('gamepad'),
+      fs = require('fs'),
       path = require('path'),
       http2 = require('http2'),
       hostingRoot = '../UserInterface',
@@ -17,9 +15,9 @@ const fs = require('fs'),
 };
 
 
-function createServer() {
 // https://devcenter.heroku.com/articles/ssl-certificate-self
-const server = http2.createSecureServer({
+const sockets = new Map(),
+      server = http2.createSecureServer({
     'key': fs.readFileSync('localhost.key'),
     'cert': fs.readFileSync('localhost.crt')
 });
@@ -47,31 +45,42 @@ server.on('stream', (stream, headers) => {
                 }
             });
         } break;
+        case 'DOWN': {
+            stream.name = stream.session.socket.remoteAddress+':'+stream.session.socket.remotePort+'/'+stream.id;
+            stream.on('close', () => {
+                if(stream.onclose)
+                    stream.onclose();
+                sockets.delete(stream.name);
+            });
+            stream.respond({':status': 200});
+            stream.write(stream.name);
+            sockets.set(stream.name, stream);
+        } break;
+        case 'UP': {
+            const socket = sockets.get(headers[':path'].substr(1));
+            stream.on('data', (data) => {
+                if(socket.ondata)
+                    socket.ondata(data);
+                stream.respond({':status': 200});
+                stream.end();
+            });
+        } break;
     }
 });
 server.listen(443);
-return server;
-}
 
-gamepad.init()
 
-// List the state of all currently attached devices
-for (let i = 0, l = gamepad.numDevices(); i < l; i++) {
-  console.log(i, gamepad.deviceAtIndex());
-}
+gamepad.init();
+for(let i = 0, l = gamepad.numDevices(); i < l; i++)
+    console.log(i, gamepad.deviceAtIndex());
 
-// Create a game loop and poll for events
 setInterval(gamepad.processEvents, 16);
-// Scan for new gamepads as a slower rate
-setInterval(gamepad.detectDevices, 500);
+setInterval(gamepad.detectDevices, 1000);
 
-// Listen for move events on all gamepads
-gamepad.on("move", function (id, axis, value) {
-  console.log("move", {
-    id: id,
-    axis: axis,
-    value: value,
-  });
+gamepad.on('move', function(id, axis, value) {
+    console.log('move', {
+        'id': id,
+        'axis': axis,
+        'value': value,
+    });
 });
-
-
