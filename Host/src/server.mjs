@@ -1,9 +1,47 @@
 const gamepad = require('gamepad'),
       fs = require('fs'),
-      path = require('path'),
-      http2 = require('http2'),
-      hostingRoot = '../UserInterface',
-      hostingDefault = 'main.html',
+      {extname, join, resolve} = require('path'),
+      {createSecureServer} = require('http2');
+
+function loadConfig(dir = join(__dirname, '..', 'config')) {
+    let config = {
+        'http': {
+            'port': 8443,
+            'key': 'key.pem',
+            'cert': 'cert.pem'
+        }
+    }
+    const path = join(dir, 'config.json');
+    try {
+        function merge(a, b) {
+            switch(typeof b) {
+                case 'string':
+                case 'number':
+                    return b;
+                case 'object':
+                    Object.keys(b).forEach(k => {
+                        a[k] = merge(a[k], b[k]);
+                    });
+            }
+            return a;
+        }
+        config = merge(config, JSON.parse(fs.readFileSync(path, {'encoding': 'utf8'})));
+    } catch(e) { }
+    fs.writeFileSync(path, JSON.stringify(config, undefined, 4), {'encoding': 'utf8'});
+    ['http.key', 'http.cert'].forEach(p => {
+        const all = p.split(/\./),
+              last = all.pop();
+        let cur = config;
+        for(const k of all)
+            cur = cur[k];
+        cur[last] = fs.readFileSync(resolve(dir, cur[last]));
+    });
+    return config;
+}
+const config = loadConfig(),
+      staticContentRoot = join(__dirname, '..', '..', 'UserInterface'),
+      server = createSecureServer(config.http),
+      sockets = new Map(),
       contentTypeByExtension = {
     '.txt': 'text/plain',
     '.js': 'text/javascript',
@@ -13,15 +51,6 @@ const gamepad = require('gamepad'),
     '.png': 'image/png',
     '.jpg': 'image/jpg'
 };
-
-
-// https://devcenter.heroku.com/articles/ssl-certificate-self
-const sockets = new Map(),
-      server = http2.createSecureServer({
-    'key': fs.readFileSync('localhost.key'),
-    'cert': fs.readFileSync('localhost.crt')
-});
-
 server.on('stream', (stream, headers) => {
     console.log('stream', headers);
     function sendErrorMessage(code) {
@@ -30,7 +59,9 @@ server.on('stream', (stream, headers) => {
     }
     switch(headers[':method']) {
         case 'GET': {
-            const filePath = (headers[':path'] == '/') ? hostingRoot+'/'+hostingDefault : hostingRoot+headers[':path'];
+            const filePath = (headers[':path'] == '/')
+                ? join(staticContentRoot, 'index.html')
+                : join(staticContentRoot, headers[':path']);
             fs.open(filePath, 'r', (error, fd) => {
                 if(error)
                     sendErrorMessage((error.code == 'ENOENT') ? 404 : 500);
@@ -39,7 +70,7 @@ server.on('stream', (stream, headers) => {
                     stream.respondWithFD(fd, {
                         'last-modified': stat.mtime.toUTCString(),
                         'content-length': stat.size,
-                        'content-type': contentTypeByExtension[path.extname(filePath)]
+                        'content-type': contentTypeByExtension[extname(filePath)]
                     });
                     stream.end();
                 }
@@ -67,20 +98,15 @@ server.on('stream', (stream, headers) => {
         } break;
     }
 });
-server.listen(443);
+server.listen(config.http.port);
+
 
 
 gamepad.init();
 for(let i = 0, l = gamepad.numDevices(); i < l; i++)
     console.log(i, gamepad.deviceAtIndex());
-
 setInterval(gamepad.processEvents, 16);
 setInterval(gamepad.detectDevices, 1000);
-
-gamepad.on('move', function(id, axis, value) {
-    console.log('move', {
-        'id': id,
-        'axis': axis,
-        'value': value,
-    });
+gamepad.on('move', (id, axis, value) => {
+    console.log('move', {id, axis, value});
 });
