@@ -1,26 +1,16 @@
 export class Socket {
     constructor() {
-        fetch('/socket', {'method': 'GET'}).then((response) => {
-            console.log(response.body);
-            const reader = response.body.getReader();
-            const receive = ({done, value}) => {
-                if(done) {
-                    if(this.onclose)
-                        this.onclose();
-                    return;
-                }
-                if(!this.name)
-                    new Response(value).text().then(data => {
-                        this.name = data;
-                        console.log(data);
-                        if(this.onopen)
-                            this.onopen();
-                    });
-                else if(this.ondata)
-                    new Response(value).json().then(data => this.ondata(data));
-                return reader.read().then(receive);
-            };
-            reader.read().then(receive);
+        const source = new EventSource('/socket');
+        source.addEventListener('uplink', (event) => {
+            this.name = event.data;
+            this.onopen();
+        });
+        source.addEventListener('error', (event) => {
+            source.close();
+            this.onclose();
+        });
+        source.addEventListener('message', (event) => {
+            this.ondata(JSON.parse(event.data));
         });
     }
 

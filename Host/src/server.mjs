@@ -75,8 +75,8 @@ server.on('stream', (stream, headers) => {
                     stream.onclose();
                 sockets.delete(stream.name);
             });
-            stream.respond({':status': 200});
-            stream.write(stream.name);
+            stream.respond({':status': 200, 'content-type': 'text/event-stream', 'Cache-Control': 'no-cache'});
+            stream.write(`event: uplink\ndata: ${stream.name}\n\n`);
             sockets.set(stream.name, stream);
             return;
         case '/':
