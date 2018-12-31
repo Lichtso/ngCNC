@@ -1,29 +1,31 @@
-class Socket {
+export class Socket {
     constructor() {
-        const socket = this;
-        fetch('/', {'method': 'DOWN'}).then(function(response) {
+        fetch('/socket', {'method': 'GET'}).then((response) => {
+            console.log(response.body);
             const reader = response.body.getReader();
-            reader.read().then(function receive({done, value}) {
+            const receive = ({done, value}) => {
                 if(done) {
-                    if(socket.onclose)
-                        socket.onclose();
+                    if(this.onclose)
+                        this.onclose();
                     return;
                 }
-                if(!socket.name)
+                if(!this.name)
                     new Response(value).text().then(data => {
-                        socket.name = data;
-                        if(socket.onopen)
-                            socket.onopen();
+                        this.name = data;
+                        console.log(data);
+                        if(this.onopen)
+                            this.onopen();
                     });
-                else if(socket.ondata)
-                    new Response(value).json().then(data => socket.ondata(data));
+                else if(this.ondata)
+                    new Response(value).json().then(data => this.ondata(data));
                 return reader.read().then(receive);
-            });
+            };
+            reader.read().then(receive);
         });
     }
 
     send(data) {
-        fetch(this.name, {'method': 'UP', 'body': JSON.stringify(data)});
+        fetch(this.name, {'method': 'POST', 'body': JSON.stringify(data)});
     }
 
     onopen() {

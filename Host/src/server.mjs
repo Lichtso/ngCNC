@@ -28,14 +28,12 @@ function loadConfig(dir = join(__dirname, '..', 'config')) {
         config = merge(config, JSON.parse(fs.readFileSync(path, {'encoding': 'utf8'})));
     } catch(e) { }
     fs.writeFileSync(path, JSON.stringify(config, undefined, 4), {'encoding': 'utf8'});
-    ['http.key', 'http.cert'].forEach(p => {
-        const all = p.split(/\./),
-              last = all.pop();
-        let cur = config;
-        for(const k of all)
-            cur = cur[k];
-        cur[last] = fs.readFileSync(resolve(dir, cur[last]));
-    });
+    try {
+        config.http.key = fs.readFileSync(resolve(dir, config.http.key));
+        config.http.cert = fs.readFileSync(resolve(dir, config.http.cert));
+    } catch(e) {
+
+    }
     return config;
 }
 const config = loadConfig(),
@@ -55,29 +53,23 @@ server.on('stream', (stream, headers) => {
     console.log('stream', headers);
     function sendErrorMessage(code) {
         stream.respond({':status': code});
-        stream.end('ERROR: '+code);
+        stream.end('Error: '+code);
     }
-    switch(headers[':method']) {
-        case 'GET': {
-            const filePath = (headers[':path'] == '/')
-                ? join(staticContentRoot, 'index.html')
-                : join(staticContentRoot, headers[':path']);
-            fs.open(filePath, 'r', (error, fd) => {
-                if(error)
-                    sendErrorMessage((error.code == 'ENOENT') ? 404 : 500);
-                else {
-                    const stat = fs.fstatSync(fd);
-                    stream.respondWithFD(fd, {
-                        'last-modified': stat.mtime.toUTCString(),
-                        'content-length': stat.size,
-                        'content-type': contentTypeByExtension[extname(filePath)]
-                    });
-                    stream.end();
-                }
-            });
-        } break;
-        case 'DOWN': {
-            stream.name = stream.session.socket.remoteAddress+':'+stream.session.socket.remotePort+'/'+stream.id;
+    let filePath;
+    if(headers[':path'].startsWith('/node_modules/'))
+        filePath = join(join(__dirname, '..'), headers[':path']);
+    else if(headers[':path'].startsWith('/socket/')) {
+        const socket = sockets.get(headers[':path'].substr(1));
+        stream.on('data', (data) => {
+            if(socket.ondata)
+                socket.ondata(data);
+            stream.respond({':status': 200});
+            stream.end();
+        });
+        return;
+    } else switch(headers[':path']) {
+        case '/socket':
+            stream.name = `${stream.session.socket.remoteAddress}:stream.session.socket.remotePort/socket/${stream.id}`;
             stream.on('close', () => {
                 if(stream.onclose)
                     stream.onclose();
@@ -86,17 +78,27 @@ server.on('stream', (stream, headers) => {
             stream.respond({':status': 200});
             stream.write(stream.name);
             sockets.set(stream.name, stream);
-        } break;
-        case 'UP': {
-            const socket = sockets.get(headers[':path'].substr(1));
-            stream.on('data', (data) => {
-                if(socket.ondata)
-                    socket.ondata(data);
-                stream.respond({':status': 200});
-                stream.end();
-            });
-        } break;
+            return;
+        case '/':
+            filePath = join(staticContentRoot, 'index.html');
+            break;
+        default:
+            filePath = join(staticContentRoot, headers[':path']);
+            break;
     }
+    fs.open(filePath, 'r', (error, fd) => {
+        if(error)
+            sendErrorMessage((error.code == 'ENOENT') ? 404 : 500);
+        else {
+            const stat = fs.fstatSync(fd);
+            stream.respondWithFD(fd, {
+                'last-modified': stat.mtime.toUTCString(),
+                'content-length': stat.size,
+                'content-type': contentTypeByExtension[extname(filePath)]
+            });
+            stream.end();
+        }
+    });
 });
 server.listen(config.http.port);
 
