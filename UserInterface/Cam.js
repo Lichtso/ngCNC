@@ -1,9 +1,7 @@
-import {quat, vec3, mat3, mat4} from './gl-matrix.js';
-import {gl} from './Webgl.js';
+import {quat, vec3, mat3, mat4} from './node_modules/gl-matrix/src/gl-matrix.js';
+import {Shared, gl} from './Webgl.js';
 
-export const Renderer = {
-    camTransform: mat4.create()
-};
+Shared.camTransform = mat4.create();
 
 const camRotation = quat.create(), prevCamRotation = quat.create(), nextCamRotation = quat.create(),
       camTranslation = vec3.create(), prevCamTranslation = vec3.create(), nextCamTranslation = vec3.create(),
@@ -11,14 +9,14 @@ const camRotation = quat.create(), prevCamRotation = quat.create(), nextCamRotat
 let zoom = 100, prevZoom = zoom, nextZoom = zoom, eventX, eventY;
 
 export function updateCam() {
-    mat4.fromQuat(Renderer.camTransform, camRotation);
-    mat4.translate(Renderer.camTransform, Renderer.camTransform, camTranslation);
-    mat4.multiply(Renderer.camTransform, projection, Renderer.camTransform);
-    Renderer.render();
+    mat4.fromQuat(Shared.camTransform, camRotation);
+    mat4.translate(Shared.camTransform, Shared.camTransform, camTranslation);
+    mat4.multiply(Shared.camTransform, projection, Shared.camTransform);
+    Shared.render();
 }
 
 export function updateProjection() {
-    const aspectRatio = gl.canvas.width/gl.canvas.height;
+    const aspectRatio = gl.canvas.clientWidth/gl.canvas.clientHeight;
     switch(projectionMode.value) {
         case 'Orthographic':
             mat4.ortho(projection, -zoom*aspectRatio, zoom*aspectRatio, -zoom, zoom, -10000.0, 10000.0);
@@ -117,8 +115,8 @@ function refineEvent(event) {
 
 gl.canvas.onmousedown = gl.canvas.ontouchstart = function(event) {
     refineEvent(event);
-    if(event.button != undefined && event.button != 1)
-        return;
+    // if(event.button != undefined && event.button != 1)
+    //     return;
     eventX = event.pointers[0].pageX;
     eventY = event.pointers[0].pageY;
     quat.copy(prevCamRotation, camRotation);

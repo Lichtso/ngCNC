@@ -1,9 +1,9 @@
+export const Shared = {};
 export const gl = document.getElementsByTagName('canvas')[0].getContext('webgl');
 
-gl.canvas.width = 1600;
-gl.canvas.height = 900;
-gl.canvas.style = `width: ${Math.floor(gl.canvas.width/window.devicePixelRatio)}px;`;
-gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+gl.canvas.height = gl.canvas.clientHeight*window.devicePixelRatio;
+gl.canvas.width = gl.canvas.clientWidth*window.devicePixelRatio;
+gl.viewport(0, 0, gl.canvas.clientWidth*window.devicePixelRatio, gl.canvas.clientHeight*window.devicePixelRatio);
 gl.clearColor(0.0, 0.0, 0.0, 1.0);
 gl.enable(gl.DEPTH_TEST);
 
@@ -17,9 +17,6 @@ export function createShader(gl, type, source) {
         source = source.replace(match[0], 'uniform '+match[2]+' '+match[3]+';');
         shader.uniformBindings.set(match[3], match[1]);
     }
-    // #version 300 es
-    // precision mediump usampler2D;
-    // precision mediump isampler2D;
     gl.shaderSource(shader, `
 #define M_PI 3.1415926535897932384626433832795
 precision mediump float;
