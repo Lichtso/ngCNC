@@ -1,14 +1,15 @@
 [Unit]
-Description=ngCNC web app host
+Description={{description}}
 Requires=network-online.target
 After=network-online.target
+
 [Service]
 Restart=on-failure
 RestartSec=5000ms
 User=root
-WorkingDirectory=/var/ngCNC
-ExecStart=/services/ngCNC/bin/ngCNC
+ExecStart=node {{installdir}}/src/server.mjs
 ExecReload=/bin/kill -HUP $MAINPID
 KillSignal=SIGINT
+
 [Install]
 WantedBy=multi-user.target
