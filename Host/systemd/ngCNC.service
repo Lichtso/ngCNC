@@ -1,6 +1,5 @@
 [Unit]
 Description={{description}}
-Requires=network-online.target
 After=network-online.target
 
 [Service]
