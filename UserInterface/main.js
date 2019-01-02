@@ -1,17 +1,15 @@
-import {vec3, mat4} from './node_modules/gl-matrix/src/gl-matrix.js';
+import {glMatrix, vec3, mat4} from './node_modules/gl-matrix/src/gl-matrix.js';
 import {Shared, gl} from './Webgl.js';
 import {updateProjection} from './Cam.js';
 import {CoordinateSystem} from './CoordinateSystem.js';
 import {Arrow} from './Arrow.js';
 import {Toolpath} from './Toolpath.js';
 import {GCode} from './GCode.js';
-import {Socket} from './Socket.js';
 
 const machineCoordinateSystem = new CoordinateSystem(vec3.fromValues(100, 100, 100)),
       workpieceCoordinateSystem = new CoordinateSystem(vec3.fromValues(50, 50, 50)),
       positionIndicator = new Arrow(vec3.fromValues(0, 0, 1000), vec3.fromValues(1.0, 0.0, 1.0)),
       toolpath = new Toolpath(workpieceCoordinateSystem),
-      socket = new Socket(),
       status = {
     'workpieceOrigin': [0, 0, 0],
     'linearPosition': [0, 0, 0],
@@ -46,3 +44,26 @@ document.getElementById('file').onchange = (event) => {
     };
     reader.readAsText(event.target.files[0]);
 };
+
+export class Socket {
+    constructor() {
+        const source = new EventSource('/socket');
+        source.addEventListener('uplink', (event) => {
+            this.name = event.data;
+        });
+        source.addEventListener('error', (event) => {
+            source.close();
+        });
+        source.addEventListener('message', (event) => {
+            this.ondata(JSON.parse(event.data));
+        });
+    }
+
+    send(data) {
+        data = JSON.stringify(data, (key, value) => {
+            return (value instanceof glMatrix.ARRAY_TYPE) ? [...value.values()] : value;
+        });
+        fetch(this.name, {'headers': {'Content-Type': 'application/json'}, 'method': 'POST', 'body': data});
+    }
+};
+const socket = new Socket();
