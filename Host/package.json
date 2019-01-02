@@ -3,15 +3,21 @@
   "version": "0.0.0-semantic-release",
   "description": "ngCNC web app host",
   "script": {
-    "package": "npm-package"
+    "package": "npm-pkgbuild pkgbuild pacman makepkg"
+  },
+  "devDependencies": {
+    "npm-pkgbuild": "^2.2.1"
   },
   "dependencies": {
     "gamepad": "^1.6.0",
     "gl-matrix": "^2.8.1"
   },
   "pacman": {
-    "installdir": "services/ngCNC",
-    "services": {
+    "installdir": "/services/ngCNC",
+    "install": "pacman/pacman.install"
+  },
+  "systemd": {
+    "units": {
       "ngCNC": "systemd/ngCNC*"
     }
   }
