@@ -10,5 +10,9 @@ ExecStart=node {{installdir}}/src/server.mjs
 ExecReload=/bin/kill -HUP $MAINPID
 KillSignal=SIGINT
 
+RuntimeDirectory={{name}}
+StateDirectory={{name}}
+ConfigurationDirectory={{name}}
+
 [Install]
 WantedBy=multi-user.target
