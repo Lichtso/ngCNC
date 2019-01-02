@@ -59,25 +59,29 @@ server.on('stream', (stream, headers) => {
     if(headers[':path'].startsWith('/node_modules/'))
         filePath = join(join(__dirname, '..'), headers[':path']);
     else if(headers[':path'].startsWith('/socket/')) {
-        const socket = sockets.get(headers[':path'].substr(1));
+        const socket = sockets.get(parseInt(headers[':path'].substr(8)));
+        if(!socket) {
+            sendErrorMessage(500);
+            return;
+        }
+        stream.data = [];
         stream.on('data', (data) => {
-            if(socket.ondata)
-                socket.ondata(data);
+            stream.data.push(data);
+        });
+        stream.on('end', () => {
             stream.respond({':status': 200});
             stream.end();
+            const data = JSON.parse(Buffer.concat(stream.data));
         });
         return;
     } else switch(headers[':path']) {
         case '/socket':
-            stream.name = `${stream.session.socket.remoteAddress}:stream.session.socket.remotePort/socket/${stream.id}`;
-            stream.on('close', () => {
-                if(stream.onclose)
-                    stream.onclose();
-                sockets.delete(stream.name);
-            });
             stream.respond({':status': 200, 'content-type': 'text/event-stream', 'Cache-Control': 'no-cache'});
-            stream.write(`event: uplink\ndata: ${stream.name}\n\n`);
-            sockets.set(stream.name, stream);
+            stream.write(`event: uplink\ndata: /socket/${stream.id}\n\n`);
+            stream.on('close', () => {
+                sockets.delete(stream.id);
+            });
+            sockets.set(stream.id, stream);
             return;
         case '/':
             filePath = join(staticContentRoot, 'index.html');

@@ -1,7 +1,8 @@
-import {vec3, mat4} from './gl-matrix.js';
+import {vec2, vec3, mat4} from './node_modules/gl-matrix/src/gl-matrix.js';
 
 export class GCode {
-    constructor(input) {
+    constructor(input, origin) {
+        this.origin = origin;
         this.operations = [];
         this.unitScale = 1;
         this.maxFeedrate = 10;
@@ -12,10 +13,9 @@ export class GCode {
         this.helixAxis = 2;
         this.helixCenter = vec3.create();
         this.linearPosition = vec3.create();
-        this.angularPosition = vec3.create();
+        this.angularPosition = vec2.create();
         this.prevTangent = vec3.create();
         this.prevLinearPosition = vec3.create();
-        this.prevAngularPosition = vec3.create();
         this.interpolationMode = 'line';
         this.positionMode = 'absolute';
         for(let line of input.split('\n')) {
@@ -125,7 +125,7 @@ export class GCode {
     codeM(value) {
         switch(command) {
             case 0:
-                this.operations.push({'type': 'Stop'});
+                this.operations.push({'type': 'Pause'});
                 break;
             case 3:
                 this.operations.push({'type': 'Spindle', 'direction': 'CW'});
@@ -150,11 +150,13 @@ export class GCode {
         const segment = {
             'type': this.interpolationMode,
             'feedrate': (this.rapidPositioning) ? this.maxFeedrate : this.feedrate,
-            'linearPosition': vec3.clone(this.linearPosition),
-            'angularPosition': vec3.clone(this.angularPosition)
+            'linearPosition': vec3.create(),
+            'angularPosition': vec2.create()
         };
+        vec3.add(segment.linearPosition, this.linearPosition, this.origin);
+        vec2.scale(segment.angularPosition, this.angularPosition, Math.PI/180.0);
         const diffVec = vec3.create();
-        vec3.sub(diffVec, this.linearPosition, this.prevLinearPosition);
+        vec3.sub(diffVec, segment.linearPosition, this.prevLinearPosition);
         switch(this.interpolationMode) {
             case 'Line': {
                 segment.length = vec3.length(diffVec);
@@ -163,6 +165,7 @@ export class GCode {
             } break;
             case 'Helix': {
                 segment.helixCenter = vec3.create();
+                segment.helixAxisName = (this.helixDirection == -1 ? '-' : '+')+['X', 'Y', 'Z'][this.helixAxis];
                 segment.helixAxis = vec3.create();
                 segment.helixAxis[this.helixAxis] = this.helixDirection;
                 if(this.helixRadius != 0.0) {
@@ -178,7 +181,7 @@ export class GCode {
                 const entryVec = vec3.create(),
                       exitVec = vec3.create();
                 vec3.sub(entryVec, this.prevLinearPosition, segment.helixCenter);
-                vec3.sub(exitVec, this.linearPosition, segment.helixCenter);
+                vec3.sub(exitVec, segment.linearPosition, segment.helixCenter);
                 segment.helixEntryHeight = vec3.dot(entryVec, segment.helixAxis);
                 segment.helixExitHeight = vec3.dot(exitVec, segment.helixAxis);
                 vec3.scaleAndAdd(entryVec, entryVec, segment.helixAxis, -segment.helixEntryHeight);
@@ -192,11 +195,11 @@ export class GCode {
                 vec3.cross(segment.exitTangent, exitVec, segment.helixAxis);
                 vec3.normalize(segment.entryTangent, segment.entryTangent);
                 vec3.normalize(segment.exitTangent, segment.exitTangent);
-                segment.transformation = mat4.fromValues(
+                segment.transform = mat4.fromValues(
                     entryVec[0], entryVec[1], entryVec[2], 0,
                     segment.entryTangent[0], segment.entryTangent[1], segment.entryTangent[2], 0,
                     segment.helixAxis[0], segment.helixAxis[1], segment.helixAxis[2], 0,
-                    segment.helixCenter[0], segment.helixCenter[1], segment.helixCenter[2], 0
+                    segment.helixCenter[0], segment.helixCenter[1], segment.helixCenter[2], 1
                 );
                 segment.helixAngle = Math.acos(vec3.dot(entryVec, exitVec));
                 if(segment.helixAngle == 0)
@@ -214,11 +217,11 @@ export class GCode {
             default:
                 return;
         }
+        // TODO: Include angularPosition in segment.length and segment.feedrate calculation
         segment.entrySpeedFactor = Math.max(0.0, vec3.dot(this.prevTangent, segment.entryTangent));
         this.operations.push(segment);
         vec3.copy(this.prevTangent, segment.exitTangent);
-        vec3.copy(this.prevLinearPosition, this.linearPosition);
-        vec3.copy(this.prevAngularPosition, this.angularPosition);
+        vec3.copy(this.prevLinearPosition, segment.linearPosition);
         vec3.set(this.helixCenter, 0.0, 0.0, 0.0);
         this.helixRadius = 0;
     }
