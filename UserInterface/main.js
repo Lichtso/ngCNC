@@ -4,7 +4,7 @@ import {updateProjection} from './Cam.js';
 import {CoordinateSystem} from './CoordinateSystem.js';
 import {Arrow} from './Arrow.js';
 import {Toolpath} from './Toolpath.js';
-import {GCode} from './GCode.js';
+import {parseGCode} from './GCode.js';
 
 const machineCoordinateSystem = new CoordinateSystem(vec3.fromValues(100, 100, 100)),
       workpieceCoordinateSystem = new CoordinateSystem(vec3.fromValues(50, 50, 50)),
@@ -38,8 +38,8 @@ updateStatus();
 document.getElementById('file').onchange = (event) => {
     const reader = new FileReader();
     reader.onload = function(event) {
-        const gcode = new GCode(event.target.result, status.workpieceOrigin);
-        toolpath.load(gcode.operations);
+        const commands = parseGCode(event.target.result, status.workpieceOrigin);
+        toolpath.load(commands);
         Shared.render();
     };
     reader.readAsText(event.target.files[0]);

@@ -1,228 +1,248 @@
-import {vec2, vec3, mat4} from './node_modules/gl-matrix/src/gl-matrix.js';
+import {vec3, mat4} from './node_modules/gl-matrix/src/gl-matrix.js';
 
-export class GCode {
-    constructor(input, origin) {
-        this.origin = origin;
-        this.operations = [];
-        this.unitScale = 1;
-        this.maxFeedrate = 10;
-        this.rapidPositioning = false;
-        this.feedrate = 1;
-        this.helixRadius = 0;
-        this.helixDirection = 1;
-        this.helixAxis = 2;
-        this.helixCenter = vec3.create();
-        this.linearPosition = vec3.create();
-        this.angularPosition = vec2.create();
-        this.prevTangent = vec3.create();
-        this.prevLinearPosition = vec3.create();
-        this.interpolationMode = 'line';
-        this.positionMode = 'absolute';
-        for(let line of input.split('\n')) {
-            const commentIndex = Math.max(line.indexOf(';'), line.indexOf('('));
-            if(commentIndex >= 0)
-                line = line.substr(0, commentIndex);
-            let usedAddress = false;
-            for(const command of line.split(' ')) {
-                const value = parseFloat(command.substr(1));
-                switch(command[0]) {
-                    // Not implemented: D E H L N O P Q R T U V W
-                    case 'A':
-                    case 'B':
-                    case 'C':
-                    case 'I':
-                    case 'J':
-                    case 'K':
-                    case 'X':
-                    case 'Y':
-                    case 'Z':
-                        usedAddress = true;
-                        this.address(command.charCodeAt(0), value);
-                        break;
-                    case 'R':
-                        usedAddress = true;
-                        this.helixRadius = value*this.unitScale;
-                        break;
-                    case 'G':
-                        this.codeG(value);
-                        break;
-                    case 'M':
-                        this.codeM(value);
-                        break;
-                    case 'F':
-                        this.feedrate = value*this.unitScale/60.0;
-                        break;
-                    case 'S':
-                        this.operations.push({'type': 'SpindleSpeed', 'value': value/60.0});
-                        break;
-                }
-            }
-            if(usedAddress)
-                this.segment();
-        }
-    }
+export function parseGCode(gcode, origin) {
+    const commands = [],
+          helixCenter = vec3.create(),
+          linearPosition = vec3.create(),
+          angularPosition = vec3.create();
+    let unitScale = 1,
+        spindleSpeed = 0,
+        spindleDirection = 0,
+        maxFeedrate = 10,
+        rapidPositioning = false,
+        feedrate = 1,
+        helixRadius = 0,
+        helixDirection = 1,
+        helixAxis = 2,
+        coordinatedMotionMode = 'line',
+        positionMode = 'absolute',
+        auxParameter,
+        prevCoordinatedMotionCommand;
 
-    address(axis, value) {
-        value *= this.unitScale;
+    const address = (axis, value) => {
+        value *= unitScale;
         let vec;
-        if(axis >= 88) { // X Y Z
+        if(axis >= 88 && axis <= 90) { // X Y Z
             axis -= 88;
-            vec = this.linearPosition;
-        } else if(axis >= 73) { // I J K
+            vec = linearPosition;
+        } else if(axis >= 73 && axis <= 75) { // I J K
             axis -= 73;
-            this.helixCenter[axis] = value;
+            helixCenter[axis] = value;
             return;
         } else { // A B C
             axis -= 65;
-            vec = this.angularPosition;
+            vec = angularPosition;
         }
-        if(this.positionMode == 'absolute')
+        if(positionMode == 'absolute')
             vec[axis] = value;
         else
             vec[axis] += value;
-    }
+    };
 
-    codeG(command) {
-        switch(command) {
+    const codeG = (value) => {
+        switch(value) {
             case 0:
             case 1:
-                this.rapidPositioning = (command == 0);
-                this.interpolationMode = 'Line';
+                rapidPositioning = (value == 0);
+                coordinatedMotionMode = 'Line';
                 break;
             case 2:
             case 3:
-                this.rapidPositioning = false;
-                this.helixDirection = (command == 2) ? 1 : -1;
-                this.interpolationMode = 'Helix';
+                rapidPositioning = false;
+                helixDirection = (value == 2) ? 1 : -1;
+                coordinatedMotionMode = 'Helix';
                 break;
             // case 4: // TODO: Dwell
             case 17:
             case 18:
             case 19:
-                this.helixAxis = 19-command;
+                helixAxis = 19-value;
                 break;
             case 20:
-                this.unitScale = 25.4;
+                unitScale = 25.4;
                 break;
             case 21:
-                this.unitScale = 1.0;
+                unitScale = 1.0;
                 break;
             case 90:
-                this.positionMode = 'absolute';
+                positionMode = 'absolute';
                 break;
             case 91:
-                this.positionMode = 'relative';
+                positionMode = 'relative';
                 break;
             case 100:
-                // this.operations.push({'type': 'ToolLengthMeasurement'}); // TODO
+                commands.push({'type': 'ToolLengthMeasurement'});
                 break;
             default:
-                this.interpolationMode = undefined;
+                coordinatedMotionMode = undefined;
                 break;
         }
-    }
+    };
 
-    codeM(value) {
-        switch(command) {
+    const codeM = (value) => {
+        switch(value) {
             case 0:
-                this.operations.push({'type': 'Pause'});
+                commands.push({'type': 'Pause'});
                 break;
             case 3:
-                this.operations.push({'type': 'Spindle', 'direction': 'CW'});
+                spindleDirection = 1;
+                commands.push({'type': 'SpindleSpeed', 'value': spindleDirection*spindleSpeed});
                 break;
             case 4:
-                this.operations.push({'type': 'Spindle', 'direction': 'CCW'});
+                spindleDirection = -1;
+                commands.push({'type': 'SpindleSpeed', 'value': spindleDirection*spindleSpeed});
                 break;
             case 5:
-                this.operations.push({'type': 'Spindle', 'direction': 'OFF'});
+                spindleDirection = 0;
+                commands.push({'type': 'SpindleSpeed', 'value': spindleDirection*spindleSpeed});
                 break;
             case 7:
             case 8:
-                this.operations.push({'type': 'Coolant', 'value': 'ON'});
+                commands.push({'type': 'Coolant', 'value': 'ON'});
                 break;
             case 9:
-                this.operations.push({'type': 'Coolant', 'value': 'OFF'});
+                commands.push({'type': 'Coolant', 'value': 'OFF'});
                 break;
         }
-    }
+    };
 
-    segment() {
-        const segment = {
-            'type': this.interpolationMode,
-            'feedrate': (this.rapidPositioning) ? this.maxFeedrate : this.feedrate,
+    const coordinatedMotionCommand = () => {
+        const command = {
+            'type': coordinatedMotionMode,
+            'feedrate': (rapidPositioning) ? maxFeedrate : feedrate,
             'linearPosition': vec3.create(),
-            'angularPosition': vec2.create()
+            'angularPosition': vec3.create()
         };
-        vec3.add(segment.linearPosition, this.linearPosition, this.origin);
-        vec2.scale(segment.angularPosition, this.angularPosition, Math.PI/180.0);
-        const diffVec = vec3.create();
-        vec3.sub(diffVec, segment.linearPosition, this.prevLinearPosition);
-        switch(this.interpolationMode) {
+        vec3.add(command.linearPosition, linearPosition, origin);
+        vec3.scale(command.angularPosition, angularPosition, Math.PI/180.0);
+        const diffVec = vec3.create(),
+              prevLinearPosition = (prevCoordinatedMotionCommand) ? prevCoordinatedMotionCommand.linearPosition : vec3.create();
+        vec3.sub(diffVec, command.linearPosition, prevLinearPosition);
+        switch(coordinatedMotionMode) {
             case 'Line': {
-                segment.length = vec3.length(diffVec);
-                segment.entryTangent = segment.exitTangent = vec3.create();
-                vec3.scale(segment.exitTangent, diffVec, 1.0/segment.length);
+                command.length = vec3.length(diffVec);
+                command.entryTangent = command.exitTangent = vec3.create();
+                vec3.scale(command.exitTangent, diffVec, 1.0/command.length);
             } break;
             case 'Helix': {
-                segment.helixCenter = vec3.create();
-                segment.helixAxisName = (this.helixDirection == -1 ? '-' : '+')+['X', 'Y', 'Z'][this.helixAxis];
-                segment.helixAxis = vec3.create();
-                segment.helixAxis[this.helixAxis] = this.helixDirection;
-                if(this.helixRadius != 0.0) {
-                    vec3.scaleAndAdd(diffVec, diffVec, segment.helixAxis, -vec3.dot(diffVec, segment.helixAxis));
-                    const sidewaysDistance = Math.sqrt(this.helixRadius*this.helixRadius-vec3.squaredLength(diffVec)*0.25),
+                command.helixCenter = vec3.create();
+                command.helixAxisName = (helixDirection == -1 ? '-' : '+')+['X', 'Y', 'Z'][helixAxis];
+                command.helixAxis = vec3.create();
+                command.helixAxis[helixAxis] = helixDirection;
+                if(helixRadius != 0.0) {
+                    vec3.scaleAndAdd(diffVec, diffVec, command.helixAxis, -vec3.dot(diffVec, command.helixAxis));
+                    const sidewaysDistance = Math.sqrt(helixRadius*helixRadius-vec3.squaredLength(diffVec)*0.25),
                           sideways = vec3.create();
-                    vec3.cross(sideways, diffVec, segment.helixAxis);
+                    vec3.cross(sideways, diffVec, command.helixAxis);
                     vec3.normalize(sideways, sideways);
-                    vec3.scale(sideways, sideways, (this.helixRadius < 0) ? -sidewaysDistance : sidewaysDistance);
-                    vec3.scaleAndAdd(this.helixCenter, sideways, diffVec, 0.5);
+                    vec3.scale(sideways, sideways, (helixRadius < 0) ? -sidewaysDistance : sidewaysDistance);
+                    vec3.scaleAndAdd(helixCenter, sideways, diffVec, 0.5);
                 }
-                vec3.add(segment.helixCenter, this.prevLinearPosition, this.helixCenter);
+                vec3.add(command.helixCenter, prevLinearPosition, helixCenter);
                 const entryVec = vec3.create(),
                       exitVec = vec3.create();
-                vec3.sub(entryVec, this.prevLinearPosition, segment.helixCenter);
-                vec3.sub(exitVec, segment.linearPosition, segment.helixCenter);
-                segment.helixEntryHeight = vec3.dot(entryVec, segment.helixAxis);
-                segment.helixExitHeight = vec3.dot(exitVec, segment.helixAxis);
-                vec3.scaleAndAdd(entryVec, entryVec, segment.helixAxis, -segment.helixEntryHeight);
-                vec3.scaleAndAdd(exitVec, exitVec, segment.helixAxis, -segment.helixExitHeight);
-                segment.helixRadius = vec3.length(entryVec);
+                vec3.sub(entryVec, prevLinearPosition, command.helixCenter);
+                vec3.sub(exitVec, command.linearPosition, command.helixCenter);
+                command.helixEntryHeight = vec3.dot(entryVec, command.helixAxis);
+                command.helixExitHeight = vec3.dot(exitVec, command.helixAxis);
+                vec3.scaleAndAdd(entryVec, entryVec, command.helixAxis, -command.helixEntryHeight);
+                vec3.scaleAndAdd(exitVec, exitVec, command.helixAxis, -command.helixExitHeight);
+                command.helixRadius = vec3.length(entryVec);
                 vec3.normalize(entryVec, entryVec);
                 vec3.normalize(exitVec, exitVec);
-                segment.entryTangent = vec3.create();
-                segment.exitTangent = vec3.create();
-                vec3.cross(segment.entryTangent, entryVec, segment.helixAxis);
-                vec3.cross(segment.exitTangent, exitVec, segment.helixAxis);
-                vec3.normalize(segment.entryTangent, segment.entryTangent);
-                vec3.normalize(segment.exitTangent, segment.exitTangent);
-                segment.transform = mat4.fromValues(
+                command.entryTangent = vec3.create();
+                command.exitTangent = vec3.create();
+                vec3.cross(command.entryTangent, entryVec, command.helixAxis);
+                vec3.cross(command.exitTangent, exitVec, command.helixAxis);
+                vec3.normalize(command.entryTangent, command.entryTangent);
+                vec3.normalize(command.exitTangent, command.exitTangent);
+                command.transform = mat4.fromValues(
                     entryVec[0], entryVec[1], entryVec[2], 0,
-                    segment.entryTangent[0], segment.entryTangent[1], segment.entryTangent[2], 0,
-                    segment.helixAxis[0], segment.helixAxis[1], segment.helixAxis[2], 0,
-                    segment.helixCenter[0], segment.helixCenter[1], segment.helixCenter[2], 1
+                    command.entryTangent[0], command.entryTangent[1], command.entryTangent[2], 0,
+                    command.helixAxis[0], command.helixAxis[1], command.helixAxis[2], 0,
+                    command.helixCenter[0], command.helixCenter[1], command.helixCenter[2], 1
                 );
-                segment.helixAngle = Math.acos(vec3.dot(entryVec, exitVec));
-                if(segment.helixAngle == 0)
-                    segment.helixAngle = Math.PI*2.0;
-                else if(vec3.dot(segment.entryTangent, exitVec) < 0)
-                    segment.helixAngle = Math.PI*2.0-segment.helixAngle;
-                segment.length = Math.hypot(segment.helixRadius*segment.helixAngle, segment.helixExitHeight-segment.helixEntryHeight);
+                command.helixAngle = Math.acos(vec3.dot(entryVec, exitVec));
+                if(command.helixAngle == 0)
+                    command.helixAngle = Math.PI*2.0;
+                else if(vec3.dot(command.entryTangent, exitVec) < 0)
+                    command.helixAngle = Math.PI*2.0-command.helixAngle;
+                command.length = Math.hypot(command.helixRadius*command.helixAngle, command.helixExitHeight-command.helixEntryHeight);
                 const aux = vec3.create();
-                vec3.scale(aux, segment.helixAxis, (segment.helixExitHeight-segment.helixEntryHeight)/segment.length);
-                vec3.add(segment.entryTangent, segment.entryTangent, aux);
-                vec3.add(segment.exitTangent, segment.exitTangent, aux);
-                vec3.normalize(segment.entryTangent, segment.entryTangent);
-                vec3.normalize(segment.exitTangent, segment.exitTangent);
+                vec3.scale(aux, command.helixAxis, (command.helixExitHeight-command.helixEntryHeight)/command.length);
+                vec3.add(command.entryTangent, command.entryTangent, aux);
+                vec3.add(command.exitTangent, command.exitTangent, aux);
+                vec3.normalize(command.entryTangent, command.entryTangent);
+                vec3.normalize(command.exitTangent, command.exitTangent);
             } break;
             default:
                 return;
         }
-        // TODO: Include angularPosition in segment.length and segment.feedrate calculation
-        segment.entrySpeedFactor = Math.max(0.0, vec3.dot(this.prevTangent, segment.entryTangent));
-        this.operations.push(segment);
-        vec3.copy(this.prevTangent, segment.exitTangent);
-        vec3.copy(this.prevLinearPosition, segment.linearPosition);
-        vec3.set(this.helixCenter, 0.0, 0.0, 0.0);
-        this.helixRadius = 0;
+        // TODO: Include angularPosition in command.length calculation
+        if(prevCoordinatedMotionCommand)
+            prevCoordinatedMotionCommand.endFeedrate = prevCoordinatedMotionCommand.feedrate*Math.max(0.0, vec3.dot(prevCoordinatedMotionCommand.exitTangent, command.entryTangent));
+        vec3.set(helixCenter, 0.0, 0.0, 0.0);
+        helixRadius = 0;
+        prevCoordinatedMotionCommand = command;
+        commands.push(command);
+    };
+
+    for(let line of gcode.split('\n')) {
+        const commentIndex = Math.max(line.indexOf(';'), line.indexOf('('));
+        if(commentIndex >= 0)
+            line = line.substr(0, commentIndex);
+        let usedAddress = false;
+        for(const command of line.split(' ')) {
+            if(command.length == 0)
+                continue;
+            const value = parseFloat(command.substr(1));
+            switch(command[0]) {
+                case 'A':
+                case 'B':
+                case 'C':
+                case 'I':
+                case 'J':
+                case 'K':
+                case 'X':
+                case 'Y':
+                case 'Z':
+                    usedAddress = true;
+                    address(command.charCodeAt(0), value);
+                    break;
+                case 'U':
+                case 'V':
+                case 'W':
+                    throw Error('U, V, W axes are not supported');
+                case 'G':
+                    codeG(value);
+                    break;
+                case 'M':
+                    codeM(value);
+                    break;
+                case 'F':
+                    feedrate = value*unitScale/60.0;
+                    break;
+                case 'P':
+                    auxParameter = value;
+                    break;
+                case 'R':
+                    usedAddress = true;
+                    helixRadius = value*unitScale;
+                    break;
+                case 'S':
+                    spindleSpeed = value/60.0;
+                    if(spindleDirection)
+                        commands.push({'type': 'SpindleSpeed', 'value': spindleDirection*spindleSpeed});
+                break;
+                default: // D E H L N O Q T
+                    throw Error(`Code ${command[0]} is not supported`);
+            }
+        }
+        if(usedAddress)
+            coordinatedMotionCommand();
+        auxParameter = undefined;
     }
-}
+    if(prevCoordinatedMotionCommand)
+        prevCoordinatedMotionCommand.endFeedrate = 0;
+    return commands;
+};

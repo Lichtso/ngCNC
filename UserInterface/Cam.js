@@ -5,40 +5,41 @@ Shared.camTransform = mat4.create();
 
 const camRotation = quat.create(), prevCamRotation = quat.create(), nextCamRotation = quat.create(),
       camTranslation = vec3.create(), prevCamTranslation = vec3.create(), nextCamTranslation = vec3.create(),
-      projection = mat4.create();
+      projection = mat4.create(),
+      animations = [];
 let zoom = 100, prevZoom = zoom, nextZoom = zoom, eventX, eventY;
 
-export function updateCam() {
-    mat4.fromQuat(Shared.camTransform, camRotation);
-    mat4.translate(Shared.camTransform, Shared.camTransform, camTranslation);
-    mat4.multiply(Shared.camTransform, projection, Shared.camTransform);
-    Shared.render();
-}
-
-export function updateProjection() {
-    const aspectRatio = gl.canvas.clientWidth/gl.canvas.clientHeight;
-    switch(projectionMode.value) {
-        case 'Orthographic':
-            mat4.ortho(projection, -zoom*aspectRatio, zoom*aspectRatio, -zoom, zoom, -10000.0, 10000.0);
-            break;
-        case 'Perspective':
-            mat4.perspective(projection, Math.PI*0.125, aspectRatio, 0.01, 10000.0);
-            mat4.translate(projection, projection, vec3.fromValues(0.0, 0.0, -zoom*5.5));
-            break;
+function animationFrame(now) {
+    for(let i = 0; i < animations.length; ++i) {
+        const animation = animations[i],
+              t = Math.min(1.0, (now-animation.startTime)/animation.duration);
+        animation.callback(t);
+        console.log(t, animation);
+        if(t == 1.0)
+            animations.splice(i--, 1);
     }
     updateCam();
+    if(Shared.continuousAnimation || animations.length > 0)
+        window.requestAnimationFrame(animationFrame);
 }
 
-function animateCam(callback, duration) {
-    const startTime = performance.now();
-    window.requestAnimationFrame(function animation(now) {
-        const t = Math.min(1.0, (now-startTime)/duration);
-        callback(t);
-        updateCam();
-        if(t < 1)
-            window.requestAnimationFrame(animation);
+function addAnimation(callback, duration=500) {
+    if(!Shared.continuousAnimation && animations.length == 0)
+        window.requestAnimationFrame(animationFrame);
+    animations.push({
+        'startTime': performance.now(),
+        duration,
+        callback
     });
 }
+
+const continuousAnimation = document.getElementById('continuousAnimation');
+continuousAnimation.onclick = function() {
+    if(!Shared.continuousAnimation && animations.length == 0)
+        window.requestAnimationFrame(animationFrame);
+    Shared.continuousAnimation = !Shared.continuousAnimation;
+    continuousAnimation.value = (Shared.continuousAnimation) ? 'Stop Animation' : 'Start Animation';
+};
 
 const projectionMode = document.getElementById('projectionMode');
 projectionMode.onclick = function() {
@@ -51,11 +52,11 @@ document.getElementById('center').onclick = function() {
     nextZoom = 100.0;
     vec3.copy(prevCamTranslation, camTranslation);
     vec3.scale(nextCamTranslation, nextCamTranslation, 0.0);
-    animateCam(function(t) {
+    addAnimation(function(t) {
         zoom = prevZoom+(nextZoom-prevZoom)*t;
         updateProjection();
         vec3.lerp(camTranslation, prevCamTranslation, nextCamTranslation, t);
-    }, 500);
+    });
 };
 
 const isometric = quat.create();
@@ -88,9 +89,9 @@ for(const name in viewRotations) {
     document.getElementById(name).onclick = function() {
         quat.copy(prevCamRotation, camRotation);
         quat.copy(nextCamRotation, viewRotations[name]);
-        animateCam(function(t) {
+        addAnimation(function(t) {
             quat.slerp(camRotation, prevCamRotation, nextCamRotation, t);
-        }, 500);
+        });
     };
 }
 
@@ -154,3 +155,26 @@ gl.canvas.onmouseup = gl.canvas.onmouseleave = gl.canvas.ontouchend = gl.canvas.
     refineEvent(event);
     eventX = eventY = undefined;
 };
+
+
+
+export function updateCam() {
+    mat4.fromQuat(Shared.camTransform, camRotation);
+    mat4.translate(Shared.camTransform, Shared.camTransform, camTranslation);
+    mat4.multiply(Shared.camTransform, projection, Shared.camTransform);
+    Shared.render();
+}
+
+export function updateProjection() {
+    const aspectRatio = gl.canvas.clientWidth/gl.canvas.clientHeight;
+    switch(projectionMode.value) {
+        case 'Orthographic':
+            mat4.ortho(projection, -zoom*aspectRatio, zoom*aspectRatio, -zoom, zoom, -10000.0, 10000.0);
+            break;
+        case 'Perspective':
+            mat4.perspective(projection, Math.PI*0.125, aspectRatio, 0.01, 10000.0);
+            mat4.translate(projection, projection, vec3.fromValues(0.0, 0.0, -zoom*5.5));
+            break;
+    }
+    updateCam();
+}
