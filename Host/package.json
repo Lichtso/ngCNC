@@ -6,7 +6,7 @@
     "package": "npm-pkgbuild pkgbuild pacman makepkg"
   },
   "devDependencies": {
-    "npm-pkgbuild": "^3.0.0"
+    "npm-pkgbuild": "^3.2.0"
   },
   "dependencies": {
     "gamepad": "^1.6.0",
@@ -14,7 +14,7 @@
   },
   "pacman": {
     "installdir": "/services/ngCNC",
-    "install": "pacman/pacman.install",
+    "install": "pacman/install.sh",
     "content": {
       "/usr/lib/tmpfiles.d/${name}.conf": "pacman/tmpfiles.conf"
     }
