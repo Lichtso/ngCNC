@@ -23,7 +23,7 @@ void LowerLimitISR() {
     for(uint8_t i = 0; i < limitSwitch.dimensions; ++i)
         if(digitalRead(limitSwitch.lowerEndPin[i])) {
             emergencyStop();
-            SerialUSB.println("ERROR: Emergency Stop - Limit Switch");
+            sendError("Emergency Stop - Limit Switch");
         }
 }
 
@@ -31,6 +31,6 @@ void UpperLimitISR() {
     for(uint8_t i = 0; i < limitSwitch.dimensions; ++i)
         if(digitalRead(limitSwitch.upperEndPin[i])) {
             emergencyStop();
-            SerialUSB.println("ERROR: Emergency Stop - Limit Switch");
+            sendError("Emergency Stop - Limit Switch");
         }
 }

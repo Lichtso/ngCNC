@@ -54,18 +54,21 @@ bool nextToken() {
 bool parseTarget() {
     if(!nextToken())
             return false;
+    sscanf(token, "%f", &feedrateManager.length);
+    if(!nextToken())
+            return false;
     sscanf(token, "%f", &feedrateManager.targetFeedrate);
-    feedrateManager.targetFeedrate = fmax(0.0F, fmin(feedrateManager.targetFeedrate, feedrateManager.maximumFeedrate));
+    feedrateManager.targetFeedrate = fmax(feedrateManager.minimumFeedrate, fmin(feedrateManager.targetFeedrate, feedrateManager.maximumFeedrate));
     if(!nextToken())
             return false;
     sscanf(token, "%f", &feedrateManager.endFeedrate);
-    feedrateManager.endFeedrate = fmax(0.0F, fmin(feedrateManager.endFeedrate, feedrateManager.maximumFeedrate));
+    feedrateManager.endFeedrate = fmax(feedrateManager.minimumFeedrate, fmin(feedrateManager.endFeedrate, feedrateManager.maximumFeedrate));
     for(uint8_t i = 0; i < AXIS_COUNT; ++i) {
         if(!nextToken())
             return false;
         float value;
         sscanf(token, "%f", &value);
-        feedrateManager.interpolator->end[i] = value/stepperMotorDriver.stepSize[i];
+        lineInterpolator.end[i] = value/stepperMotorDriver.stepSize[i];
     }
     return true;
 }
@@ -89,48 +92,82 @@ bool parseCommand() {
         feedrateManager.interpolate = (FeedrateManager::Interpolate)&HelixInterpolator::interpolate;
         if(!parseTarget())
             return false;
-        // TODO: helixInterpolator.axis[], helixInterpolator.center[]
+        int32_t center[3];
+        for(uint8_t i = 0; i < 3; ++i) {
+            if(!nextToken())
+                return false;
+            float value;
+            sscanf(token, "%f", &value);
+            center[i] = value/stepperMotorDriver.stepSize[i];
+        }
+        if(!nextToken())
+            return false;
+        if(!strlen(token) == 2)
+            return false;
+        switch(token[0]) {
+            case '-':
+                helixInterpolator.clockwise = false;
+                break;
+            case '+':
+                helixInterpolator.clockwise = true;
+                break;
+            default:
+                return false;
+        }
+        switch(token[1]) {
+            case 'X':
+                helixInterpolator.axis[0] = 1;
+                helixInterpolator.axis[1] = 2;
+                break;
+            case 'Y':
+                helixInterpolator.axis[0] = 0;
+                helixInterpolator.axis[1] = 2;
+                break;
+            case 'Z':
+                helixInterpolator.axis[0] = 0;
+                helixInterpolator.axis[1] = 1;
+                break;
+            default:
+                return false;
+        }
+        helixInterpolator.center[0] = center[helixInterpolator.axis[0]];
+        helixInterpolator.center[1] = center[helixInterpolator.axis[1]];
         helixInterpolator.begin();
         feedrateManager.enterSegment();
     } else if(strcmp(token, "SoftStop") == 0)
         feedrateManager.targetFeedrate = feedrateManager.endFeedrate = 0.0F;
     else if(strcmp(token, "HardStop") == 0)
         feedrateManager.exitSegment();
-    else if(strcmp(token, "Spindle") == 0) {
-        if(!nextToken())
-            return false;
-        if(strcmp(token, "CW") == 0) {
-            spindleMotorDriver.setDirection(false);
-            spindleMotorDriver.setEnable(true);
-        } else if(strcmp(token, "CCW") == 0) {
-            spindleMotorDriver.setDirection(true);
-            spindleMotorDriver.setEnable(true);
-        } else if(strcmp(token, "OFF") == 0)
-            spindleMotorDriver.setEnable(false);
-        else
-            return false;
-    } else if(strcmp(token, "SpindleSpeed") == 0) {
+    else if(strcmp(token, "SpindleSpeed") == 0) {
         if(!nextToken())
             return false;
         sscanf(token, "%f", &spindleMotorDriver.targetSpeed);
         spindleMotorDriver.setSpeed();
+    } else if(strcmp(token, "MaximumAccelleration") == 0) {
+        if(!nextToken())
+            return false;
+        sscanf(token, "%f", &feedrateManager.maximumAccelleration);
+    } else if(strcmp(token, "MaximumFeedrate") == 0) {
+        if(!nextToken())
+            return false;
+        sscanf(token, "%f", &feedrateManager.maximumFeedrate);
     } else if(strcmp(token, "Coolant") == 0) {
         if(!nextToken())
             return false;
-        if(strcmp(token, "ON") == 0) {
+        if(strcmp(token, "ON") == 0)
             digitalWrite(coolantPin, HIGH);
-        } else if(strcmp(token, "OFF") == 0) {
+        else if(strcmp(token, "OFF") == 0)
             digitalWrite(coolantPin, LOW);
-        } else
+        else
             return false;
     } else if(strcmp(token, "Illumination") == 0) {
         if(!nextToken())
             return false;
-        if(strcmp(token, "ON") == 0) {
+        if(strcmp(token, "ON") == 0)
             digitalWrite(illuminationPin, HIGH);
-        } else if(strcmp(token, "OFF") == 0) {
+        else if(strcmp(token, "OFF") == 0)
             digitalWrite(illuminationPin, LOW);
-        } else
+        else
             return false;
     } else
         return false;
@@ -150,7 +187,7 @@ void loop() {
             bufferIndex = 0;
             tokenEnd = buffer-1;
             if(!parseCommand())
-                SerialUSB.println("ERROR: Invalid Command");
+                sendError("Invalid Command");
         }
     }
 
@@ -159,6 +196,17 @@ void loop() {
 
     if(currentLoopIteration-lastStatusReport > statusReportInterval) {
         lastStatusReport = floor(currentLoopIteration/statusReportInterval)*statusReportInterval;
-        statusReport();
+        SerialUSB.print("Status ");
+        SerialUSB.print(currentLoopIteration/1000000.0);
+        SerialUSB.print(' ');
+        for(uint8_t i = 0; i < AXIS_COUNT; ++i) {
+            SerialUSB.print(stepperMotorDriver.current[i]*stepperMotorDriver.stepSize[i], 4);
+            SerialUSB.print(' ');
+        }
+        SerialUSB.print(feedrateManager.progressLeft);
+        SerialUSB.print(' ');
+        SerialUSB.print(feedrateManager.currentFeedrate);
+        SerialUSB.print(' ');
+        SerialUSB.println(spindleMotorDriver.currentSpeed);
     }
 }

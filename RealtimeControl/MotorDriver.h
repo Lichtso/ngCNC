@@ -2,10 +2,13 @@
 
 #define AXIS_COUNT 5
 uint32_t lastLoopIteration, lastStatusReport;
-
-void statusReport();
 void emergencyStop();
-
+void sendError(const char* message) {
+    SerialUSB.print("Error ");
+    SerialUSB.print(micros()/1000000.0);
+    SerialUSB.print(' ');
+    SerialUSB.println(message);
+}
 
 
 struct StepperMotorDriver {
@@ -18,12 +21,12 @@ struct StepperMotorDriver {
             stepPin[dimensions];
 
     void setup() {
-        stepAccumulator = 0;
         for(uint8_t i = 0; i < dimensions; ++i) {
             pinMode(enablePin[i], OUTPUT);
             pinMode(directionPin[i], OUTPUT);
             pinMode(stepPin[i], OUTPUT);
         }
+        resetStepSignals();
     }
 
     void setEnable(bool enabled) {
@@ -37,7 +40,7 @@ struct StepperMotorDriver {
     }
 
     void step(uint8_t i) {
-        stepAccumulator += stepSize[i]*stepSize[i];
+        stepAccumulator += stepSize[i]*stepSize[i]; // TODO: Correct stepSize of angular movement
         digitalWrite(stepPin[i], HIGH);
         if(direction[i])
             ++current[i];
@@ -58,17 +61,16 @@ StepperMotorDriver stepperMotorDriver;
 void TurnISR();
 void AlertISR() {
     emergencyStop();
-    SerialUSB.println("ERROR: Emergency Stop - Spindle Motor");
+    sendError("Emergency Stop - Spindle Motor");
 }
 
 struct SpindleMotorDriver {
     uint8_t enablePin, turnPin, alertPin, speedPin, directionPin;
     volatile uint32_t prevTurn, currentTurn;
     uint16_t voltage;
-    float speed, targetSpeed, maximumSpeed;
+    float currentSpeed, targetSpeed, maximumSpeed;
 
     void setup() {
-        setEnable(false);
         pinMode(enablePin, OUTPUT);
         pinMode(turnPin, INPUT);
         pinMode(alertPin, INPUT);
@@ -81,20 +83,14 @@ struct SpindleMotorDriver {
     }
 
     void setSpeed() {
-        voltage = fmax(0.0F, fmin((targetSpeed/maximumSpeed-0.05F)*0.84F, 1.0F))*4095;
+        voltage = fmax(0.0F, fmin((fabs(targetSpeed)/maximumSpeed-0.05F)*0.84F, 1.0F))*4095;
         analogWrite(DAC0, voltage);
-    }
-
-    void setDirection(bool direction) {
-        digitalWrite(directionPin, direction);
-    }
-
-    void setEnable(bool enable) {
-        digitalWrite(enablePin, !enable);
+        digitalWrite(directionPin, targetSpeed > 0.0);
+        digitalWrite(enablePin, targetSpeed != 0.0);
     }
 
     void loop() {
-        speed = (currentTurn-prevTurn < 1000) ? 0.0F : 1000000.0F/(currentTurn-prevTurn);
+        currentSpeed = (currentTurn-prevTurn < 1000) ? 0.0F : 1000000.0F/(currentTurn-prevTurn);
         prevTurn = currentTurn = lastLoopIteration;
         // TODO: Speed control
     }
