@@ -38,12 +38,42 @@ updateStatus();
 document.getElementById('file').onchange = (event) => {
     const reader = new FileReader();
     reader.onload = function(event) {
-        const commands = parseGCode(event.target.result, status.workpieceOrigin);
-        toolpath.load(commands);
-        Shared.render();
+        updateCommandQueue(parseGCode(event.target.result, status.workpieceOrigin));
+        socket.send({'type': 'CommandQueue', 'commands': toolpath.commands});
     };
     reader.readAsText(event.target.files[0]);
 };
+
+const commandQueue = document.getElementById('commandQueue');
+commandQueue.onchange = (event) => {
+    toolpath.selection = [];
+    let lastSlice;
+    for(let i = 0; i < toolpath.commands.length; ++i) {
+        if(commandQueue.children[i].selected) {
+            if(lastSlice)
+                ++lastSlice.length;
+            else {
+                lastSlice = {'start': i, 'length': 1};
+                toolpath.selection.push(lastSlice);
+            }
+        } else
+            lastSlice = undefined;
+    }
+    Shared.render();
+};
+
+function updateCommandQueue(commands) {
+    toolpath.load(commands);
+    while(commandQueue.children.length > 0)
+        commandQueue.removeChild(commandQueue.children[0]);
+    for(let i = 0; i < toolpath.commands.length; ++i) {
+        const entry = document.createElement('option');
+        entry.value = i;
+        entry.textContent = toolpath.getCommandDescription(toolpath.commands[i]);
+        commandQueue.appendChild(entry);
+    }
+    Shared.render();
+}
 
 export class Socket {
     constructor() {

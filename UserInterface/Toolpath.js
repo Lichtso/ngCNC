@@ -10,6 +10,7 @@ void main() {
     gl_Position = transform*vec4(position.xyz, 1.0);
     timestamp = position.w;
 }`), createShader(gl, gl.FRAGMENT_SHADER, `
+uniform vec2 selection;
 uniform float timeThreshold, timeOffset;
 varying float timestamp;
 
@@ -18,6 +19,8 @@ void main() {
         (timestamp <= timeThreshold) ? 1.0 :
         (mod(timestamp+timeOffset, 2.0) < 1.0) ? 0.25 : 0.75
     );
+    if(timestamp >= selection.s && timestamp < selection.t)
+        gl_FragColor.rgb *= vec3(2.0, 1.0, 0.0);
     gl_FragColor.a = 1.0;
 }`));
 
@@ -26,6 +29,32 @@ export class Toolpath {
         this.coordinateSystem = coordinateSystem;
         this.vertices = 0;
         this.arcPrecision = 0.1;
+        this.selection = [];
+        this.commands = [];
+    }
+
+    getCommandDescription(command) {
+        switch(command.type) {
+            case 'ToolLengthMeasurement':
+                return 'Measure tool length';
+            case 'SoftStop':
+                return `Stop gracefully`;
+            case 'HardStop':
+                return `Stop abruptly`;
+            case 'SpindleSpeed':
+            case 'MaximumAccelleration':
+            case 'MaximumFeedrate':
+                return `Set ${command.type} to ${command.value}`;
+            case 'Coolant':
+            case 'Illumination':
+                return `Switch ${command.type} ${command.value}`;
+            case 'Line':
+                return `Line to ${command.linearPosition} ${command.angularPosition}`;
+            case 'Helix':
+                return `Helix around ${command.helixAxisName} ${command.helixCenter} ${command.helixRadius} to ${command.linearPosition} ${command.angularPosition}`;
+            default:
+                return command.type;
+        }
     }
 
     load(commands) {
@@ -87,7 +116,9 @@ export class Toolpath {
                     }
                 } break;
             }
-            time += command.length/command.feedrate;
+            command.timestamp = time;
+            command.duration = command.length/command.feedrate;
+            time += command.duration;
             prevLinearPosition = command.linearPosition;
             prevAngularPosition = command.angularPosition;
         }
@@ -108,6 +139,14 @@ export class Toolpath {
         mat4.fromTranslation(transform, translation);
         mat4.multiply(transform, this.coordinateSystem.transform, transform);
         mat4.multiply(transform, Shared.camTransform, transform);
+        if(this.selection.length == 0)
+            gl.uniform2f(gl.getUniformLocation(program, 'selection'), -1, -1);
+        else
+            for(const selection of this.selection) {
+                const lastCommand = this.commands[selection.start+selection.length-1];
+                gl.uniform2f(gl.getUniformLocation(program, 'selection'), this.commands[selection.start].timestamp, lastCommand.timestamp+lastCommand.duration);
+                break;
+            }
         if(Shared.continuousAnimation)
             gl.uniform1f(gl.getUniformLocation(program, 'timeOffset'), performance.now()/1000.0);
         gl.uniformMatrix4fv(gl.getUniformLocation(program, 'transform'), false, transform);
