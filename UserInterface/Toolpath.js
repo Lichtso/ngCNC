@@ -11,13 +11,13 @@ void main() {
     timestamp = position.w;
 }`), createShader(gl, gl.FRAGMENT_SHADER, `
 uniform vec2 selection;
-uniform float timeThreshold, timeOffset;
+uniform float timeThreshold, animationOffset;
 varying float timestamp;
 
 void main() {
     gl_FragColor.rgb = vec3(
         (timestamp <= timeThreshold) ? 1.0 :
-        (mod(timestamp+timeOffset, 2.0) < 1.0) ? 0.25 : 0.75
+        (mod(timestamp+animationOffset, 2.0) < 1.0) ? 0.25 : 0.75
     );
     if(timestamp >= selection.s && timestamp < selection.t)
         gl_FragColor.rgb *= vec3(2.0, 1.0, 0.0);
@@ -128,7 +128,7 @@ export class Toolpath {
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
     }
 
-    render() {
+    render(status) {
         if(!this.vertices)
             return;
         gl.useProgram(program);
@@ -139,16 +139,22 @@ export class Toolpath {
         mat4.fromTranslation(transform, translation);
         mat4.multiply(transform, this.coordinateSystem.transform, transform);
         mat4.multiply(transform, Shared.camTransform, transform);
-        if(this.selection.length == 0)
-            gl.uniform2f(gl.getUniformLocation(program, 'selection'), -1, -1);
-        else
-            for(const selection of this.selection) {
-                const lastCommand = this.commands[selection.start+selection.length-1];
-                gl.uniform2f(gl.getUniformLocation(program, 'selection'), this.commands[selection.start].timestamp, lastCommand.timestamp+lastCommand.duration);
-                break;
-            }
+        let selectionStart = -1, selectionEnd = -1;
+        for(const selection of this.selection) {
+            const lastCommand = this.commands[selection.start+selection.length-1];
+            selectionStart = this.commands[selection.start].timestamp;
+            selectionEnd = lastCommand.timestamp+lastCommand.duration;
+            break;
+        }
+        gl.uniform2f(gl.getUniformLocation(program, 'selection'), selectionStart, selectionEnd);
+        let timeThreshold = -1;
+        if(status.commandQueueIndex < this.commands.length) {
+            const command = this.commands[status.commandQueueIndex];
+            timeThreshold = command.timestamp+command.duration*status.progress;
+        }
+        gl.uniform1f(gl.getUniformLocation(program, 'timeThreshold'), timeThreshold);
         if(Shared.continuousAnimation)
-            gl.uniform1f(gl.getUniformLocation(program, 'timeOffset'), performance.now()/1000.0);
+            gl.uniform1f(gl.getUniformLocation(program, 'animationOffset'), performance.now()/1000.0);
         gl.uniformMatrix4fv(gl.getUniformLocation(program, 'transform'), false, transform);
         gl.enableVertexAttribArray(0);
         gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);

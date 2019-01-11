@@ -11,9 +11,11 @@ const machineCoordinateSystem = new CoordinateSystem(vec3.fromValues(100, 100, 1
       positionIndicator = new Arrow(vec3.fromValues(0, 0, 1000), vec3.fromValues(1.0, 0.0, 1.0)),
       toolpath = new Toolpath(workpieceCoordinateSystem),
       status = {
+    'commandQueueIndex': 0,
+    'progress': 0,
     'workpieceOrigin': [0, 0, 0],
     'linearPosition': [0, 0, 0],
-    'angularPosition': [0, 0]
+    'angularPosition': [0, 0, 0]
 };
 
 Shared.render = () => {
@@ -21,7 +23,7 @@ Shared.render = () => {
     machineCoordinateSystem.render();
     workpieceCoordinateSystem.render();
     positionIndicator.render();
-    toolpath.render();
+    toolpath.render(status);
 };
 updateProjection();
 
