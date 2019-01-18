@@ -1,11 +1,9 @@
 #include "LimitSwitch.h"
 
-const uint8_t coolantPin = 44, illuminationPin = 45;
+const uint8_t coolantPin = 22, illuminationPin = 24;
 const float statusReportInterval = 1000000.0F/4; // 1/4 seconds
 
 void setup() {
-    // REG_PIOx_OWER, REG_PIOx_OWDR
-    // REG_PIOx_ODSR, REG_PIOx_SODR, REG_PIOx_CODR
     pinMode(coolantPin, OUTPUT);
     pinMode(illuminationPin, OUTPUT);
 
@@ -15,10 +13,14 @@ void setup() {
         stepperMotorDriver.enablePin[i] = motorDriverPins[i];
         stepperMotorDriver.directionPin[i] = motorDriverPins[i]+2;
         stepperMotorDriver.stepPin[i] = motorDriverPins[i]+4;
+        // stepperMotorDriver.setEnable(); // TODO
         limitSwitch.lowerEndPin[i] = 2+i*2;
         limitSwitch.upperEndPin[i] = 3+i*2;
     }
+    stepperMotorDriver.stepSize[4] = 0.0; // TODO
+    stepperMotorDriver.stepSize[5] = 0.0; // TODO
     stepperMotorDriver.setup();
+    limitSwitch.toolLengthSensor = 30;
     limitSwitch.setup();
 
     spindleMotorDriver.enablePin = 34;
@@ -29,7 +31,7 @@ void setup() {
     spindleMotorDriver.maximumSpeed = 200.0F; // 200 Hz or 12000 rpm
     spindleMotorDriver.setup();
 
-    feedrateManager.stopButtonPin = 43;
+    feedrateManager.stopButtonPin = 32;
     feedrateManager.maximumAccelleration = 1.0F;
     feedrateManager.minimumFeedrate = 0.01F;
     feedrateManager.maximumFeedrate = 5.0F;
