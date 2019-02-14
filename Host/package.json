@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "gamepad": "^1.6.0",
-    "gl-matrix": "^2.8.1"
+    "gl-matrix": "^3.0.0"
   },
   "pacman": {
     "installdir": "/services/ngCNC",
