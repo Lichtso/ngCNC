@@ -2,8 +2,8 @@
   "name": "ngCNC",
   "version": "0.0.0-semantic-release",
   "description": "ngCNC web app host",
-  "script": {
-    "package": "npm-pkgbuild pkgbuild pacman makepkg"
+  "scripts": {
+    "package": "npm-pkgbuild  --npm-dist --npm-modules -t /data/binaries/arch-linux/packages pkgbuild pacman makepkg"
   },
   "devDependencies": {
     "npm-pkgbuild": "^5.0.1"
@@ -11,18 +11,6 @@
   "dependencies": {
     "gamepad": "^1.6.0",
     "gl-matrix": "^3.0.0"
-  },
-  "pacman": {
-    "installdir": "/services/ngCNC",
-    "install": "pacman/install.sh",
-    "content": {
-      "/usr/lib/tmpfiles.d/${name}.conf": "pacman/tmpfiles.conf"
-    }
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Lichtso/ngCNC",
-    "directory": "Host"
   },
   "pacman": {
     "backup": "etc/${name}/config.json",
@@ -35,6 +23,11 @@
     "depends": {
       "systemd": ">=240.0"
     }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Lichtso/ngCNC",
+    "directory": "Host"
   },
   "systemd": {
     "units": {
