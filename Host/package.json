@@ -24,9 +24,21 @@
     "url": "https://github.com/Lichtso/ngCNC",
     "directory": "Host"
   },
+  "pacman": {
+    "backup": "etc/${name}/config.json",
+    "install": "pacman/install.sh",
+    "installdir": "/services/${name}",
+    "content": {
+      "/usr/lib/tmpfiles.d/${name}.conf": "pacman/tmpfiles.conf",
+      "/etc/${name}/config.json": "config/config.json"
+    },
+    "depends": {
+      "systemd": ">=240.0"
+    }
+  },
   "systemd": {
     "units": {
-      "ngCNC": "systemd/ngCNC*"
+      "${name}": "systemd/${name}*"
     }
   }
 }
