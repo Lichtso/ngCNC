@@ -6,7 +6,7 @@
     "package": "npm-pkgbuild  --npm-dist --npm-modules -t /data/binaries/arch-linux/packages pkgbuild pacman makepkg"
   },
   "devDependencies": {
-    "npm-pkgbuild": "^5.0.1"
+    "npm-pkgbuild": "^5.0.2"
   },
   "dependencies": {
     "gamepad": "^1.6.0",
