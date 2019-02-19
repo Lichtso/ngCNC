@@ -57,7 +57,7 @@ server.on('stream', (stream, headers) => {
     }
     let filePath;
     if(headers[':path'].startsWith('/node_modules/'))
-        filePath = join(join(__dirname, '..'), headers[':path']);
+        filePath = join(__dirname, '..', headers[':path']);
     else if(headers[':path'].startsWith('/socket/')) {
         const socket = sockets.get(parseInt(headers[':path'].substr(8)));
         if(!socket) {
