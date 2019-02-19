@@ -46,59 +46,64 @@ LineInterpolator lineInterpolator;
 
 struct HelixInterpolator : public Interpolator {
     int32_t center[2],
-            diff[2],
-            radius,
+            hand[2],
+            sign[2],
             error;
-    uint8_t axis[2], sector;
-    bool clockwise;
+    uint32_t radius;
+    uint8_t axis[2],
+            sector;
+    bool clockwise,
+         swap;
 
     void begin() {
-        int32_t end[2] = {lineInterpolator.end[axis[0]]-center[0], lineInterpolator.end[axis[0]]-center[1]};
+        int32_t end[2] = {lineInterpolator.end[axis[0]]-center[0], lineInterpolator.end[axis[1]]-center[1]};
         lineInterpolator.end[axis[0]] = stepperMotorDriver.current[axis[0]];
         lineInterpolator.end[axis[1]] = stepperMotorDriver.current[axis[1]];
         lineInterpolator.begin();
         lineInterpolator.end[axis[0]] = end[0];
-        lineInterpolator.end[axis[1]] = end[1];
         lineInterpolator.start[axis[0]] -= center[0];
+        lineInterpolator.end[axis[1]] = end[1];
         lineInterpolator.start[axis[1]] -= center[1];
-        radius = hypot(lineInterpolator.start[0], lineInterpolator.start[1]);
-        diff[1] = 0;
+        radius = hypot(lineInterpolator.start[axis[0]], lineInterpolator.start[axis[1]]);
         sector = -1;
-        // for(uint8_t i = 0; i < AXIS_COUNT; ++i)
-        //     error[i] = diff[longestAxis]/2;
+        hand[1] = 0;
+        while(interpolate<true>() > 0.0F);
     }
 
+    template<bool dryrun = false>
     float interpolate() {
-        if(diff[1] <= 0) {
-            diff[0] = 0;
-            diff[1] = radius;
-            error = 2-2*radius;
-            // TODO: stepperMotorDriver.setDirection(i, diff[i] >= 0);
-            if(++sector >= 4)
+        if(hand[0] <= 0) {
+            if(++sector >= 4) {
+                sector = -1;
                 return 0.0F;
+            }
+            hand[0] = radius;
+            hand[1] = 0;
+            error = 2-2*radius;
+            swap = sector&1;
+            sign[0] = sector == 0 || sector == 3;
+            sign[1] = sector < 2;
+            if(!dryrun) {
+                stepperMotorDriver.setDirection(axis[0], !sign[swap]);
+                stepperMotorDriver.setDirection(axis[1], sign[1-swap]^clockwise);
+            }
+            sign[0] = (sign[0]) ? 1 : -1;
+            sign[1] = (sign[1]^clockwise) ? 1 : -1;
         }
 
         int32_t doubleError = error*2;
-        if(doubleError < diff[0]*2+1)
-            error += (++diff[0])*2+1;
-        if(doubleError > diff[1]*-2+1)
-            error += (--diff[1])*-2+1;
+        if(doubleError > hand[0]*-2+1) {
+            error += (--hand[0])*-2+1;
+            if(!dryrun)
+                stepperMotorDriver.step(swap);
+        }
+        if(doubleError < hand[1]*2+1) {
+            error += (++hand[1])*2+1;
+            if(!dryrun)
+                stepperMotorDriver.step(1-swap);
+        }
 
-        int32_t sign[2]; // TODO: clockwise / mirrored
-        sign[0] = (sector >= 2) ? -1 : 1;
-        sign[1] = (sector == 1 || sector == 2) ? -1 : 1;
-
-        int32_t currentPos[2];
-        currentPos[axis[0]] = center[axis[0]]+sign[0]*diff[0];
-        currentPos[axis[1]] = center[axis[1]]+sign[1]*diff[1];
-        // lineInterpolator.interpolate();
-
-        // printf("%d %d %d\n", current[0], current[1], error);
-        // if((current[0]-center[0])*start[1]-(current[1]-center[1])*start[0] >= 0 ||
-        //   (current[0]-center[0])*end[1]-(current[1]-center[1])*end[0] < 0)
-        //    setPixel(current[0], current[1]);
-
-        return 1.0F; // TODO: Progress / distance left
+        return 1.0F; // TODO: Invoke lineInterpolator.interpolate();
     }
 };
 HelixInterpolator helixInterpolator;
