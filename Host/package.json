@@ -18,7 +18,8 @@
     "installdir": "/services/${name}",
     "content": {
       "/usr/lib/tmpfiles.d/${name}.conf": "pacman/tmpfiles.conf",
-      "/etc/${name}/config.json": "config/config.json"
+      "/etc/${name}/config.json": "config/config.json",
+      "${installdir}/docroot": "../UserInterface/**/*"
     },
     "depends": {
       "systemd": ">=240.0"
