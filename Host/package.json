@@ -6,7 +6,7 @@
     "package": "npm-pkgbuild  --npm-dist --npm-modules -t /data/binaries/arch-linux/packages pkgbuild pacman makepkg"
   },
   "devDependencies": {
-    "npm-pkgbuild": "^5.0.3"
+    "npm-pkgbuild": "^5.0.4"
   },
   "dependencies": {
     "gamepad": "^1.6.0",
@@ -19,7 +19,7 @@
     "content": {
       "/usr/lib/tmpfiles.d/${name}.conf": "pacman/tmpfiles.conf",
       "/etc/${name}/config.json": "config/config.json",
-      "${installdir}/docroot": "../UserInterface/**/*"
+      "${installdir}/docroot/": "../UserInterface/**/*"
     },
     "depends": {
       "systemd": ">=240.0"
