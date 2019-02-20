@@ -70,6 +70,7 @@ bool parseTarget() {
             return false;
         float value;
         sscanf(token, "%f", &value);
+        lineInterpolator.start[i] = stepperMotorDriver.current[i];
         lineInterpolator.end[i] = value/stepperMotorDriver.stepSize[i];
     }
     return true;
@@ -79,19 +80,15 @@ bool parseCommand() {
     if(!nextToken())
         return false;
     if(strcmp(token, "Line") == 0) {
-        if(feedrateManager.interpolator)
+        if(feedrateManager.active)
             return false;
-        feedrateManager.interpolator = &lineInterpolator;
-        feedrateManager.interpolate = (FeedrateManager::Interpolate)&LineInterpolator::interpolate;
         if(!parseTarget())
             return false;
         lineInterpolator.begin();
         feedrateManager.enterSegment();
     } else if(strcmp(token, "Helix") == 0) {
-        if(feedrateManager.interpolator)
+        if(feedrateManager.active)
             return false;
-        feedrateManager.interpolator = &helixInterpolator;
-        feedrateManager.interpolate = (FeedrateManager::Interpolate)&HelixInterpolator::interpolate;
         if(!parseTarget())
             return false;
         int32_t center[3];
@@ -108,33 +105,33 @@ bool parseCommand() {
             return false;
         switch(token[0]) {
             case '-':
-                helixInterpolator.clockwise = false;
+                circleInterpolator.clockwise = false;
                 break;
             case '+':
-                helixInterpolator.clockwise = true;
+                circleInterpolator.clockwise = true;
                 break;
             default:
                 return false;
         }
         switch(token[1]) {
             case 'X':
-                helixInterpolator.axis[0] = 1;
-                helixInterpolator.axis[1] = 2;
+                lineInterpolator.circleAxis[0] = 1;
+                lineInterpolator.circleAxis[1] = 2;
                 break;
             case 'Y':
-                helixInterpolator.axis[0] = 0;
-                helixInterpolator.axis[1] = 2;
+                lineInterpolator.circleAxis[0] = 0;
+                lineInterpolator.circleAxis[1] = 2;
                 break;
             case 'Z':
-                helixInterpolator.axis[0] = 0;
-                helixInterpolator.axis[1] = 1;
+                lineInterpolator.circleAxis[0] = 0;
+                lineInterpolator.circleAxis[1] = 1;
                 break;
             default:
                 return false;
         }
-        helixInterpolator.center[0] = center[helixInterpolator.axis[0]];
-        helixInterpolator.center[1] = center[helixInterpolator.axis[1]];
-        helixInterpolator.begin();
+        circleInterpolator.center[0] = center[lineInterpolator.circleAxis[0]];
+        circleInterpolator.center[1] = center[lineInterpolator.circleAxis[1]];
+        circleInterpolator.begin();
         feedrateManager.enterSegment();
     } else if(strcmp(token, "SoftStop") == 0)
         feedrateManager.targetFeedrate = feedrateManager.endFeedrate = 0.0F;

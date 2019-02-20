@@ -3,9 +3,6 @@
 void StopButtonISR();
 
 struct FeedrateManager {
-    typedef float (Interpolator::*Interpolate)();
-    Interpolator* interpolator;
-    Interpolate interpolate;
     float maximumAccelleration,
           minimumFeedrate,
           maximumFeedrate,
@@ -15,6 +12,7 @@ struct FeedrateManager {
           progressLeft,
           length;
     uint8_t stopButtonPin;
+    bool active;
 
     void setup() {
         pinMode(stopButtonPin, INPUT);
@@ -27,7 +25,7 @@ struct FeedrateManager {
     }
 
     void loop(float seconds) {
-        if(!interpolator)
+        if(!active)
             return;
         // NVIC_DisableIRQ(TC3_IRQn);
         float slowDownTime = (currentFeedrate-endFeedrate)/maximumAccelleration,
@@ -43,7 +41,7 @@ struct FeedrateManager {
     }
 
     void intervalHandler() {
-        progressLeft = (interpolator->*interpolate)();
+        progressLeft = lineInterpolator.interpolate();
         TC_SetRC(TC1, 0, sqrt(stepperMotorDriver.stepAccumulator)/fmax(minimumFeedrate, currentFeedrate)*(VARIANT_MCK/128)); // TC_CMR_TCCLKS_TIMER_CLOCK4 = 128
         if(progressLeft == 0.0F || (targetFeedrate == 0.0F && currentFeedrate == 0.0F))
             exitSegment();
@@ -52,14 +50,14 @@ struct FeedrateManager {
     }
 
     void enterSegment() {
+        active = true;
         intervalHandler();
         TC_Start(TC1, 0);
     }
 
     void exitSegment() {
         TC_Stop(TC1, 0);
-        interpolator = NULL;
-        interpolate = NULL;
+        active = false;
         targetFeedrate = endFeedrate = 0.0F;
         stepperMotorDriver.resetStepSignals();
         lastStatusReport = 0;
