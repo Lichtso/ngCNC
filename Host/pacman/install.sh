@@ -1,5 +1,5 @@
 pre_install() {
-	useradd -U -l -M -r -s /usr/bin/nologin -d /var/lib/{{name}} -c "{{description}}" {{name}}
+	useradd -U -l -M -r -s /usr/bin/nologin -d /var/lib/{{name}} -c "{{description}}" ngcnc 
 }
 
 post_install() {
@@ -26,6 +26,6 @@ pre_remove() {
 
 post_remove() {
 	systemctl daemon-reload
-	userdel {{name}}
-	groupdel {{name}}
+	userdel ngcnc
+	groupdel ngcnc
 }
