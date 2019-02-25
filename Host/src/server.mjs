@@ -3,7 +3,12 @@ const gamepad = require('gamepad'),
       {extname, join, resolve} = require('path'),
       {createSecureServer} = require('http2');
 
-function loadConfig(dir = join(__dirname, '..', 'config')) {
+function loadConfig(dir) {
+  if (dir === undefined) {
+    dir =
+      process.env.CONFIGURATION_DIRECTORY || join(__dirname, "..", "config");
+  }
+
     let config = {
         'http': {
             'port': 8443,
