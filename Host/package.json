@@ -6,14 +6,17 @@
     "package": "npm-pkgbuild  --npm-dist --npm-modules -t /data/binaries/arch-linux/packages pkgbuild pacman makepkg"
   },
   "devDependencies": {
-    "npm-pkgbuild": "^5.1.0"
+    "npm-pkgbuild": "^5.1.2"
   },
   "dependencies": {
     "gamepad": "^1.6.0",
     "gl-matrix": "^3.0.0"
   },
   "pacman": {
-    "arch": ["aarch64", "armv7h"],
+    "arch": [
+      "aarch64",
+      "armv7h"
+    ],
     "backup": "etc/${name}/config.json",
     "install": "pacman/install.sh",
     "installdir": "/services/${name}",
