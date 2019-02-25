@@ -1,6 +1,6 @@
 #include "LimitSwitch.h"
 
-const uint8_t coolantPin = 22, illuminationPin = 24;
+const uint8_t coolantPin = 30, illuminationPin = 24;
 const float statusReportInterval = 1000000.0F/4; // 1/4 seconds
 
 void setup() {
@@ -20,7 +20,7 @@ void setup() {
     stepperMotorDriver.stepSize[4] = 0.0; // TODO
     stepperMotorDriver.stepSize[5] = 0.0; // TODO
     stepperMotorDriver.setup();
-    limitSwitch.toolLengthSensor = 30;
+    limitSwitch.toolLengthSensor = 26;
     limitSwitch.setup();
 
     spindleMotorDriver.enablePin = 34;
@@ -31,7 +31,8 @@ void setup() {
     spindleMotorDriver.maximumSpeed = 200.0F; // 200 Hz or 12000 rpm
     spindleMotorDriver.setup();
 
-    feedrateManager.stopButtonPin = 32;
+    feedrateManager.stopButtonPin = 12;
+    feedrateManager.statusLedPin = 13;
     feedrateManager.maximumAccelleration = 1.0F;
     feedrateManager.minimumFeedrate = 0.01F;
     feedrateManager.maximumFeedrate = 5.0F;
@@ -84,6 +85,8 @@ bool parseCommand() {
             return false;
         if(!parseTarget())
             return false;
+        lineInterpolator.circleAxis[0] = -1;
+        lineInterpolator.circleAxis[1] = -1;
         lineInterpolator.begin();
         feedrateManager.enterSegment();
     } else if(strcmp(token, "Helix") == 0) {
@@ -185,7 +188,9 @@ void loop() {
             buffer[bufferIndex] = 0;
             bufferIndex = 0;
             tokenEnd = buffer-1;
-            if(!parseCommand())
+            if(parseCommand())
+                SerialUSB.print("OK\n");
+            else
                 sendError("Invalid Command");
         }
     }
@@ -202,10 +207,11 @@ void loop() {
             SerialUSB.print(stepperMotorDriver.current[i]*stepperMotorDriver.stepSize[i], 4);
             SerialUSB.print(' ');
         }
-        SerialUSB.print(feedrateManager.progressLeft);
+        SerialUSB.print((feedrateManager.active) ? 1.0F-feedrateManager.progressLeft : -1.0F);
         SerialUSB.print(' ');
         SerialUSB.print(feedrateManager.currentFeedrate);
         SerialUSB.print(' ');
-        SerialUSB.println(spindleMotorDriver.currentSpeed);
+        SerialUSB.print(spindleMotorDriver.currentSpeed);
+        SerialUSB.print('\n');
     }
 }

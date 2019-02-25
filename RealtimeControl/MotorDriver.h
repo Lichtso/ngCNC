@@ -7,7 +7,8 @@ void sendError(const char* message) {
     SerialUSB.print("Error ");
     SerialUSB.print(micros()/1000000.0);
     SerialUSB.print(' ');
-    SerialUSB.println(message);
+    SerialUSB.print(message);
+    SerialUSB.print('\n');
 }
 
 

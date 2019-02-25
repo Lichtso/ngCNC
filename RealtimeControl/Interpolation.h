@@ -6,8 +6,8 @@ struct LineInterpolator {
             end[AXIS_COUNT],
             diff[AXIS_COUNT],
             error[AXIS_COUNT];
-    uint32_t stepsLeft;
-    uint8_t longestAxis, circleAxis[2];
+    uint32_t stepsLeft, stepCount;
+    uint8_t circleAxis[2];
 
     void begin();
     float interpolate();
@@ -46,9 +46,9 @@ struct CircleInterpolator {
     bool step() {
         if(hand[0] <= 0) {
             if(++quadrant >= 4) {
+                quadrant = 0;
                 if(dryrun)
                     return false;
-                quadrant = 0;
             }
             updateQuadrant<dryrun>();
         }
@@ -66,65 +66,86 @@ struct CircleInterpolator {
         return true;
     }
 
+    int32_t signum(int32_t value) {
+        return (value == 0) ? 0 : (value < 0) ? -1 : 1;
+    }
+
     void begin() {
+        bool fullCircle = true;
         for(uint8_t i = 0; i < 2; ++i) {
             start[i] = lineInterpolator.start[lineInterpolator.circleAxis[i]]-center[i];
             end[i] = lineInterpolator.end[lineInterpolator.circleAxis[i]]-center[i];
             lineInterpolator.start[lineInterpolator.circleAxis[i]] = 0;
             lineInterpolator.end[lineInterpolator.circleAxis[i]] = 0;
+            if(start[i] != end[i])
+                fullCircle = false;
         }
         radius = hypot(start[0], start[1]);
         quadrant = 0;
         updateQuadrant<true>();
-        int32_t position[2], storedError = error;
+        int32_t position[2], storedError = error, storedHand0 = hand[0], storedHand1 = hand[1];
         int8_t storedQuadrant = quadrant;
         while(step<true>()) {
             position[0] = hand[  swap]*sign[0];
             position[1] = hand[1-swap]*sign[1];
-            bool isInsideDesiredArc =
-                position[0]*start[1]-position[1]*start[0] < 0 &&
-                position[0]*end[1]-position[1]*end[0] >= 0;
+            bool atStart = position[0] == start[0] && position[1] == start[1];
+            bool isInsideDesiredArc = fullCircle;
+            if(!fullCircle) {
+                if(atStart)
+                    isInsideDesiredArc = false;
+                else if(clockwise)
+                    isInsideDesiredArc |= !(position[1]*start[0]-position[0]*start[1] >= 0 &&
+                                          position[0]*end[1]-position[1]*end[0] >= 0);
+                else
+                    isInsideDesiredArc |= position[1]*start[0]-position[0]*start[1] >= 0 &&
+                                          position[0]*end[1]-position[1]*end[0] >= 0;
+            }
             if(isInsideDesiredArc)
                 ++lineInterpolator.end[lineInterpolator.circleAxis[0]];
-            position[0] += center[lineInterpolator.circleAxis[0]];
-            position[1] += center[lineInterpolator.circleAxis[1]];
+            if(atStart) {
+                storedError = error;
+                storedQuadrant = quadrant;
+                storedHand0 = hand[0];
+                storedHand1 = hand[1];
+            }
         }
         lineInterpolator.begin();
         quadrant = storedQuadrant;
         updateQuadrant<false>();
         error = storedError;
-        hand[0] = fabs(start[  swap]);
-        hand[1] = fabs(start[1-swap]);
+        hand[0] = storedHand0;
+        hand[1] = storedHand1;
     }
 };
 CircleInterpolator circleInterpolator;
 
 void LineInterpolator::begin() {
+    stepCount = 0;
     for(uint8_t i = 0; i < AXIS_COUNT; ++i) {
         diff[i] = end[i]-start[i];
         stepperMotorDriver.setDirection(i, diff[i] >= 0);
         if(diff[i] < 0)
             diff[i] *= -1;
-        if(diff[i] > diff[longestAxis])
-            longestAxis = i;
+        if(diff[i] > stepCount)
+            stepCount = diff[i];
     }
     for(uint8_t i = 0; i < AXIS_COUNT; ++i)
-        error[i] = diff[longestAxis]/2;
-    stepsLeft = diff[longestAxis];
+        error[i] = stepCount/2;
+    stepsLeft = stepCount;
 }
 
 float LineInterpolator::interpolate() {
     if(stepsLeft == 0)
-        return 0.0F;
+        return -1.0F;
     for(uint8_t i = 0; i < AXIS_COUNT; ++i) {
         error[i] -= diff[i];
         if(error[i] < 0) {
-            error[i] += diff[longestAxis];
+            error[i] += stepCount;
             if(i == circleAxis[0])
                 circleInterpolator.step<false>();
             else
                 stepperMotorDriver.step(i);
         }
     }
-    return (float)(--stepsLeft)/diff[longestAxis];
+    return (float)(--stepsLeft)/stepCount;
 }
