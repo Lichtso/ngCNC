@@ -13,7 +13,7 @@
     "gl-matrix": "^3.0.0"
   },
   "pacman": {
-    "arch": "aarch64,armv7h",
+    "arch": ["aarch64", "armv7h"],
     "backup": "etc/${name}/config.json",
     "install": "pacman/install.sh",
     "installdir": "/services/${name}",
