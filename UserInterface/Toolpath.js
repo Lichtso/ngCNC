@@ -17,7 +17,7 @@ varying float timestamp;
 void main() {
     gl_FragColor.rgb = vec3(
         (timestamp <= timeThreshold) ? 1.0 :
-        (mod(timestamp+animationOffset, 2.0) < 1.0) ? 0.25 : 0.75
+        (mod(timestamp-animationOffset, 2.0) < 1.0) ? 0.25 : 0.75
     );
     if(timestamp >= selection.s && timestamp < selection.t)
         gl_FragColor.rgb *= vec3(2.0, 1.0, 0.0);
@@ -83,6 +83,8 @@ export class Toolpath {
         for(const command of commands) {
             if(!command.linearPosition)
                 continue;
+            command.timestamp = time;
+            command.duration = command.length/command.feedrate;
             switch(command.type) {
                 case 'Line': {
                     const vertexCount = Math.max(1, Math.ceil(vec3.distance(prevAngularPosition, command.angularPosition)/this.arcPrecision));
@@ -100,7 +102,6 @@ export class Toolpath {
                 } break;
                 case 'Helix': {
                     const angleSlope = (command.helixExitHeight-command.helixEntryHeight)/command.helixAngle,
-                          angleLength = Math.hypot(command.helixRadius, angleSlope),
                           vertexCount = Math.ceil((vec3.distance(prevAngularPosition, command.angularPosition)+command.helixAngle)/this.arcPrecision);
                     for(let j = 1; j <= vertexCount; ++j) {
                         const t = j/vertexCount*command.helixAngle;
@@ -111,13 +112,11 @@ export class Toolpath {
                         vec3.transformMat4(linearPosition, linearPosition, transform);
                         for(let i = 0; i < 3; ++i)
                             positions.push(linearPosition[i]);
-                        positions.push(time+t*angleLength);
+                        positions.push(time+j/vertexCount*command.duration);
                         ++this.vertices;
                     }
                 } break;
             }
-            command.timestamp = time;
-            command.duration = command.length/command.feedrate;
             time += command.duration;
             prevLinearPosition = command.linearPosition;
             prevAngularPosition = command.angularPosition;
@@ -148,9 +147,9 @@ export class Toolpath {
         }
         gl.uniform2f(gl.getUniformLocation(program, 'selection'), selectionStart, selectionEnd);
         let timeThreshold = -1;
-        if(status.commandQueueIndex < this.commands.length) {
+        if(status.commandQueueIndex >= 0) {
             const command = this.commands[status.commandQueueIndex];
-            timeThreshold = command.timestamp+command.duration*status.progress;
+            timeThreshold = command.timestamp+command.duration*Math.max(0.0, status.progress);
         }
         gl.uniform1f(gl.getUniformLocation(program, 'timeThreshold'), timeThreshold);
         if(Shared.continuousAnimation)

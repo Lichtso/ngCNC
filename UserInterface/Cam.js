@@ -96,7 +96,7 @@ for(const name in viewRotations) {
 }
 
 gl.canvas.onwheel = function(event) {
-    zoom = Math.max(1.0, zoom+event.deltaY*0.1);
+    zoom = Math.max(1.0, zoom+event.deltaY);
     updateProjection();
     event.stopPropagation();
     event.preventDefault();

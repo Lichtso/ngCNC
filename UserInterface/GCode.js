@@ -8,7 +8,7 @@ export function parseGCode(gcode, origin) {
     let unitScale = 1,
         spindleSpeed = 0,
         spindleDirection = 0,
-        maxFeedrate = 10,
+        maxFeedrate = 5,
         rapidPositioning = false,
         feedrate = 1,
         helixRadius = 0,
