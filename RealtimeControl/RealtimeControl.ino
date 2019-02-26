@@ -4,26 +4,29 @@ const uint8_t coolantPin = 30, illuminationPin = 24;
 const float statusReportInterval = 1000000.0F/4; // 1/4 seconds
 
 void setup() {
+    digitalWrite(coolantPin, HIGH);
+    digitalWrite(illuminationPin, HIGH);
     pinMode(coolantPin, OUTPUT);
     pinMode(illuminationPin, OUTPUT);
 
     uint8_t motorDriverPins[] = { 42, 48, 37, 43, 49 };
     for(uint8_t i = 0; i < AXIS_COUNT; ++i) {
         stepperMotorDriver.stepSize[i] = 5.0/6400; // 5mm per revolution, 200*32 steps per revolution
-        stepperMotorDriver.enablePin[i] = motorDriverPins[i];
+        stepperMotorDriver.disablePin[i] = motorDriverPins[i];
         stepperMotorDriver.directionPin[i] = motorDriverPins[i]+2;
         stepperMotorDriver.stepPin[i] = motorDriverPins[i]+4;
-        // stepperMotorDriver.setEnable(); // TODO
         limitSwitch.lowerEndPin[i] = 2+i*2;
         limitSwitch.upperEndPin[i] = 3+i*2;
     }
-    stepperMotorDriver.stepSize[4] = 0.0; // TODO
-    stepperMotorDriver.stepSize[5] = 0.0; // TODO
+    stepperMotorDriver.stepSize[2] *= -1; // Invert Z Axis
+    stepperMotorDriver.stepSize[4] = 0.0; // TODO: Angular Axis A
+    stepperMotorDriver.stepSize[5] = 0.0; // TODO: Angular Axis B
     stepperMotorDriver.setup();
+    stepperMotorDriver.setEnable(true);
     limitSwitch.toolLengthSensor = 26;
     limitSwitch.setup();
 
-    spindleMotorDriver.enablePin = 34;
+    spindleMotorDriver.disablePin = 34;
     spindleMotorDriver.turnPin = 36;
     spindleMotorDriver.alertPin = 38;
     spindleMotorDriver.speedPin = DAC0;
@@ -35,7 +38,6 @@ void setup() {
     feedrateManager.statusLedPin = 13;
     feedrateManager.maximumAccelleration = 1.0F;
     feedrateManager.minimumFeedrate = 0.01F;
-    feedrateManager.maximumFeedrate = 5.0F;
     feedrateManager.setup();
 
     SerialUSB.begin(115200);
@@ -61,11 +63,11 @@ bool parseTarget() {
     if(!nextToken())
             return false;
     sscanf(token, "%f", &feedrateManager.targetFeedrate);
-    feedrateManager.targetFeedrate = fmax(feedrateManager.minimumFeedrate, fmin(feedrateManager.targetFeedrate, feedrateManager.maximumFeedrate));
+    feedrateManager.targetFeedrate = fmax(feedrateManager.minimumFeedrate, feedrateManager.targetFeedrate);
     if(!nextToken())
             return false;
     sscanf(token, "%f", &feedrateManager.endFeedrate);
-    feedrateManager.endFeedrate = fmax(feedrateManager.minimumFeedrate, fmin(feedrateManager.endFeedrate, feedrateManager.maximumFeedrate));
+    feedrateManager.endFeedrate = fmax(feedrateManager.minimumFeedrate, feedrateManager.endFeedrate);
     for(uint8_t i = 0; i < AXIS_COUNT; ++i) {
         if(!nextToken())
             return false;
@@ -145,30 +147,30 @@ bool parseCommand() {
             return false;
         sscanf(token, "%f", &spindleMotorDriver.targetSpeed);
         spindleMotorDriver.setSpeed();
+    } else if(strcmp(token, "MinimumFeedrate") == 0) {
+        if(!nextToken())
+            return false;
+        sscanf(token, "%f", &feedrateManager.minimumFeedrate);
     } else if(strcmp(token, "MaximumAccelleration") == 0) {
         if(!nextToken())
             return false;
         sscanf(token, "%f", &feedrateManager.maximumAccelleration);
-    } else if(strcmp(token, "MaximumFeedrate") == 0) {
-        if(!nextToken())
-            return false;
-        sscanf(token, "%f", &feedrateManager.maximumFeedrate);
     } else if(strcmp(token, "Coolant") == 0) {
         if(!nextToken())
             return false;
         if(strcmp(token, "ON") == 0)
-            digitalWrite(coolantPin, HIGH);
-        else if(strcmp(token, "OFF") == 0)
             digitalWrite(coolantPin, LOW);
+        else if(strcmp(token, "OFF") == 0)
+            digitalWrite(coolantPin, HIGH);
         else
             return false;
     } else if(strcmp(token, "Illumination") == 0) {
         if(!nextToken())
             return false;
         if(strcmp(token, "ON") == 0)
-            digitalWrite(illuminationPin, HIGH);
-        else if(strcmp(token, "OFF") == 0)
             digitalWrite(illuminationPin, LOW);
+        else if(strcmp(token, "OFF") == 0)
+            digitalWrite(illuminationPin, HIGH);
         else
             return false;
     } else

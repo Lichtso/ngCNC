@@ -1,14 +1,10 @@
-import {vec3, mat4} from './node_modules/gl-matrix/src/gl-matrix.js';
+import {vec3, mat4} from './node_modules/gl-matrix/esm/index.js';
 
 export function parseGCode(gcode, origin) {
-    const commands = [],
-          helixCenter = vec3.create(),
-          linearPosition = vec3.create(),
-          angularPosition = vec3.create();
     let unitScale = 1,
         spindleSpeed = 0,
         spindleDirection = 0,
-        maxFeedrate = 5,
+        maximumFeedrate = 5,
         rapidPositioning = false,
         feedrate = 1,
         helixRadius = 0,
@@ -18,6 +14,10 @@ export function parseGCode(gcode, origin) {
         positionMode = 'absolute',
         auxParameter,
         prevCoordinatedMotionCommand;
+    const commands = [],
+          helixCenter = vec3.create(),
+          linearPosition = vec3.create(),
+          angularPosition = vec3.create();
 
     const address = (axis, value) => {
         value *= unitScale;
@@ -109,7 +109,7 @@ export function parseGCode(gcode, origin) {
     const coordinatedMotionCommand = () => {
         const command = {
             'type': coordinatedMotionMode,
-            'feedrate': (rapidPositioning) ? maxFeedrate : feedrate,
+            'feedrate': (rapidPositioning) ? maximumFeedrate : feedrate,
             'linearPosition': vec3.create(),
             'angularPosition': vec3.create()
         };
@@ -220,7 +220,7 @@ export function parseGCode(gcode, origin) {
                     codeM(value);
                     break;
                 case 'F':
-                    feedrate = value*unitScale/60.0;
+                    feedrate = Math.min(maximumFeedrate, value*unitScale/60.0);
                     break;
                 case 'P':
                     auxParameter = value;

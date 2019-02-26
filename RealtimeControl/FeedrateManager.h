@@ -5,7 +5,6 @@ void StopButtonISR();
 struct FeedrateManager {
     float maximumAccelleration,
           minimumFeedrate,
-          maximumFeedrate,
           targetFeedrate,
           endFeedrate,
           currentFeedrate,
@@ -45,15 +44,19 @@ struct FeedrateManager {
         // NVIC_EnableIRQ(TC3_IRQn);
     }
 
-    void stepAndSetTimeInterval() {
+    void handleSegment() {
         progressLeft = lineInterpolator.interpolate();
         TC_SetRC(TC1, 0, sqrt(stepperMotorDriver.stepAccumulator)/fmax(minimumFeedrate, currentFeedrate)*(VARIANT_MCK/128)); // TC_CMR_TCCLKS_TIMER_CLOCK4 = 128
+        if(progressLeft == -1.0F || (targetFeedrate == 0.0F && currentFeedrate == 0.0F))
+            exitSegment();
+        else
+            stepperMotorDriver.resetStepSignals();
     }
 
     void enterSegment() {
         active = true;
         digitalWrite(statusLedPin, HIGH);
-        stepAndSetTimeInterval();
+        handleSegment();
         TC_Start(TC1, 0);
     }
 
@@ -73,11 +76,7 @@ void StopButtonISR() {
 }
 
 void TC3_Handler() {
-    feedrateManager.stepAndSetTimeInterval();
-    if(feedrateManager.progressLeft == -1.0F || (feedrateManager.targetFeedrate == 0.0F && feedrateManager.currentFeedrate == 0.0F))
-        feedrateManager.exitSegment();
-    else
-        stepperMotorDriver.resetStepSignals();
+    feedrateManager.handleSegment();
     TC_GetStatus(TC1, 0);
 }
 
