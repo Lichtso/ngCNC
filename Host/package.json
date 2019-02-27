@@ -19,11 +19,11 @@
     ],
     "backup": "etc/${name}/config.json",
     "install": "pacman/install.sh",
-    "installdir": "/services/${name}",
+    "installdir": "/services/${name}/Host",
     "content": {
       "/usr/lib/tmpfiles.d/${name}.conf": "pacman/tmpfiles.conf",
       "/etc/${name}/config.json": "config/config.json",
-      "${installdir}/UserInterface/": {
+      "${installdir}/../UserInterface/": {
         "base": "../UserInterface"
       }
     },
