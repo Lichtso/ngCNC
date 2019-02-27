@@ -12,6 +12,14 @@ function loadConfig(dir) {
             'port': 8443,
             'key': 'key.pem',
             'cert': 'cert.pem'
+        },
+        'hid': {
+           'vid': 121,  // DragonRise TwinShock Gamepad
+           'pid': 6
+        },
+        'serial': {
+           'path': '/dev/tty.usbmodem274',
+           'baudRate': 115200
         }
     }
     const path = join(dir, 'config.json');
@@ -119,8 +127,7 @@ server.on('stream', (stream, headers) => {
 server.listen(config.http.port);
 
 
-
-const gamepad = new HID.HID(121, 6), // DragonRise TwinShock Gamepad
+const gamepad = new HID.HID(config.hid.vid, config.hid.pid),
       gamepadInputState = {'axes': [], 'buttons': [], 'active': false, 'feedrate': 0, 'spindleSpeed': 0};
 gamepad.on('data', function(data) {
     gamepadInputState.active = (data[7] == 0x40);
@@ -202,8 +209,7 @@ const status = {
     'commandQueueIndex': -1,
     'workpieceOrigin': [0, 0, 0]
 };
-config.serial = {'path': '/dev/tty.usbmodem274'};
-const serial = new serialport(config.serial.path, {'baudRate': 115200});
+const serial = new serialport(config.serial.path, { 'baudRate': config.serial.baudRate });
 serial.pipe(new serialport.parsers.Readline()).on('data', (data) => {
     console.log('From Arduino: '+data);
     data = data.split(' ');
