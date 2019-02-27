@@ -9,8 +9,9 @@
     "npm-pkgbuild": "^5.1.7"
   },
   "dependencies": {
-    "gamepad": "^1.6.0",
-    "gl-matrix": "^3.0.0"
+    "gl-matrix": "^3.0.0",
+    "node-hid": "^0.7.7",
+    "serialport": "^7.1.1"
   },
   "pacman": {
     "arch": [

@@ -1,14 +1,12 @@
-const gamepad = require('gamepad'),
+const HID = require('node-hid'),
+      serialport = require('serialport'),
       fs = require('fs'),
       {extname, join, resolve} = require('path'),
       {createSecureServer} = require('http2');
 
 function loadConfig(dir) {
-  if (dir === undefined) {
-    dir =
-      process.env.CONFIGURATION_DIRECTORY || join(__dirname, "..", "config");
-  }
-
+    if(dir === undefined)
+        dir = process.env.CONFIGURATION_DIRECTORY || join(__dirname, '..', 'config');
     let config = {
         'http': {
             'port': 8443,
@@ -55,7 +53,6 @@ const config = loadConfig(),
     '.jpg': 'image/jpg'
 };
 server.on('stream', (stream, headers) => {
-    console.log('stream', headers);
     function sendErrorMessage(code) {
         stream.respond({':status': code});
         stream.end('Error: '+code);
@@ -64,8 +61,8 @@ server.on('stream', (stream, headers) => {
     if(headers[':path'].startsWith('/node_modules/'))
         filePath = join(__dirname, '..', headers[':path']);
     else if(headers[':path'].startsWith('/socket/')) {
-        const socket = sockets.get(parseInt(headers[':path'].substr(8)));
-        if(!socket) {
+        const srcSocket = sockets.get(parseInt(headers[':path'].substr(8)));
+        if(!srcSocket) {
             sendErrorMessage(500);
             return;
         }
@@ -77,12 +74,22 @@ server.on('stream', (stream, headers) => {
             stream.respond({':status': 200});
             stream.end();
             const data = JSON.parse(Buffer.concat(stream.data));
+            switch(data.type) {
+                case 'CommandQueue': {
+                    commandQueue = data.commands;
+                    const packetStr = `data: ${JSON.stringify({'type': 'CommandQueue', 'commands': commandQueue})}\n\n`;
+                    for(const dstSocket of sockets.values())
+                        if(dstSocket != srcSocket)
+                            dstSocket.write(packetStr);
+                } break;
+            }
         });
         return;
     } else switch(headers[':path']) {
         case '/socket':
             stream.respond({':status': 200, 'content-type': 'text/event-stream', 'Cache-Control': 'no-cache'});
             stream.write(`event: uplink\ndata: /socket/${stream.id}\n\n`);
+            stream.write(`data: ${JSON.stringify({'type': 'CommandQueue', 'commands': commandQueue})}\n\n`);
             stream.on('close', () => {
                 sockets.delete(stream.id);
             });
@@ -113,11 +120,146 @@ server.listen(config.http.port);
 
 
 
-gamepad.init();
-for(let i = 0, l = gamepad.numDevices(); i < l; i++)
-    console.log(i, gamepad.deviceAtIndex());
-setInterval(gamepad.processEvents, 16);
-setInterval(gamepad.detectDevices, 1000);
-gamepad.on('move', (id, axis, value) => {
-    console.log('move', {id, axis, value});
+const gamepad = new HID.HID(121, 6), // DragonRise TwinShock Gamepad
+      gamepadInputState = {'axes': [], 'buttons': [], 'active': false, 'feedrate': 0, 'spindleSpeed': 0};
+gamepad.on('data', function(data) {
+    gamepadInputState.active = (data[7] == 0x40);
+    if(!gamepadInputState.active)
+        return;
+    const axes = [data[0], data[1], data[3], data[4]].map(x => Math.max(-1, (x-128)/127)).concat([
+        [0, -1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1],
+        [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]
+    ][data[5]&0xF]);
+    for(let i = 0; i < axes.length; i += 2) {
+        let factor = Math.hypot(axes[i], axes[i+1]);
+        factor = (factor == 0.0) ? 0.0 : 1.0/factor;
+        axes[i] *= factor;
+        axes[i+1] *= factor;
+    }
+    const buttons = [];
+    for(let i = 4; i < 16; ++i) {
+        const byte = 5+Math.floor(i/8);
+        buttons[i-4] = (data[byte]>>(i%8))&1;
+    }
+    for(let i = 0; i < axes.length; i += 2)
+        if(gamepadInputState.axes[i] != axes[i] || gamepadInputState.axes[i+1] != axes[i+1])
+            handleGamepadAxisCross(i/2, axes[i], axes[i+1]);
+    for(let i = 0; i < buttons.length; ++i)
+        if(gamepadInputState.buttons[i] != buttons[i])
+            handleGamepadButton(i, buttons[i]);
+    gamepadInputState.axes = axes;
+    gamepadInputState.buttons = buttons;
 });
+gamepad.on('error', function(error) {
+    console.log('Gamepad: '+error);
+});
+function handleGamepadAxisCross(index, x, y) {
+    console.log('Gamepad: Axis Cross', index, x, y);
+    if(status.linearPosition && (index == 0 || index == 2)) {
+        let command = 'SoftStop';
+        if(x != 0 || y != 0) {
+            command = {'type': 'Line', 'length': 1000.0, 'feedrate': gamepadInputState.feedrate, 'endFeedrate': 0.0, 'linearPosition': [...status.linearPosition], 'angularPosition': status.angularPosition};
+            if(index == 0) {
+                command.linearPosition[0] += x*command.length;
+                command.linearPosition[1] -= y*command.length;
+            } else
+                command.linearPosition[2] -= y*command.length;
+            command = `HardStop\nLine ${command.length} ${command.feedrate} ${command.endFeedrate} ${command.linearPosition.join(' ')} ${command.angularPosition.slice(0, 2).join(' ')}`;
+        }
+        sendToRealtimeControl(command);
+    }
+}
+function handleGamepadButton(index, pressed) {
+    console.log('Gamepad: Button', index, pressed);
+    switch(index) {
+        case 0:
+            sendToRealtimeControl(`Coolant ${(pressed) ? 'ON' : 'OFF'}`);
+            break;
+        case 1:
+            sendToRealtimeControl(`Illumination ${(pressed) ? 'ON' : 'OFF'}`);
+            break;
+        case 4:
+        case 6:
+            if(!pressed)
+                return;
+            gamepadInputState.feedrate += (index == 6 ? -1 : 1);
+            gamepadInputState.feedrate = Math.min(Math.max(0, gamepadInputState.feedrate), 5);
+            break;
+        case 5:
+        case 7:
+            if(!pressed)
+                return;
+            gamepadInputState.spindleSpeed += (index == 7) ? -10 : 10;
+            sendToRealtimeControl(`SpindleSpeed ${gamepadInputState.spindleSpeed}`);
+            break;
+    }
+}
+
+
+let commandQueue = [];
+const status = {
+    'readyFlag': true,
+    'commandQueueIndex': -1,
+    'workpieceOrigin': [0, 0, 0]
+};
+config.serial = {'path': '/dev/tty.usbmodem274'};
+const serial = new serialport(config.serial.path, {'baudRate': 115200});
+serial.pipe(new serialport.parsers.Readline()).on('data', (data) => {
+    console.log('From Arduino: '+data);
+    data = data.split(' ');
+    const packet = {'type': data[0], 'timestamp': parseFloat(data[1])};
+    switch(data[0]) {
+        case 'OK':
+            status.readyFlag = true;
+            status.progress = 0;
+            break;
+        case 'Status':
+            status.linearPosition = data.slice(2, 5).map((x) => parseFloat(x));
+            status.angularPosition = data.slice(5, 7).map((x) => parseFloat(x));
+            status.progress = parseFloat(data[7]);
+            status.commandsInQueue = commandQueue.length;
+            status.currentFeedrate = parseFloat(data[8]);
+            status.currentSpindleSpeed = parseFloat(data[9]);
+            packet.status = status;
+            break;
+        case 'Error':
+            packet.message = data.slice(2).join(' ');
+            status.commandQueueIndex = -1;
+            commandQueue = [];
+            break;
+    }
+    if(status.readyFlag && status.progress == -1.0 && commandQueue.length > 0 && ++status.commandQueueIndex < commandQueue.length) {
+        const command = commandQueue[status.commandQueueIndex];
+        let response;
+        switch(command.type) {
+            case 'SoftStop':
+            case 'HardStop':
+                response = command.type;
+                break;
+            case 'SpindleSpeed':
+            case 'MinimumFeedrate':
+            case 'MaximumAccelleration':
+            case 'Coolant':
+            case 'Illumination':
+                response = `${command.type} ${command.value}`;
+                break;
+            case 'Line':
+                response = `${command.type} ${command.length} ${command.feedrate} ${command.endFeedrate} ${command.linearPosition.join(' ')} ${command.angularPosition.slice(0, 2).join(' ')}`;
+                break;
+            case 'Helix':
+                response = `${command.type} ${command.length} ${command.feedrate} ${command.endFeedrate} ${command.linearPosition.join(' ')} ${command.angularPosition.slice(0, 2).join(' ')} ${command.helixCenter.join(' ')} ${command.helixAxisName}`;
+                break;
+        }
+        if(status.commandQueueIndex > commandQueue.length)
+            status.commandQueueIndex = commandQueue.length;
+        sendToRealtimeControl(response);
+    }
+    const packetStr = `data: ${JSON.stringify(packet)}\n\n`;
+    for(const dstSocket of sockets.values())
+        dstSocket.write(packetStr);
+});
+function sendToRealtimeControl(command) {
+    console.log('To Arduino: '+command);
+    serial.write(command+'\n');
+    status.readyFlag = false;
+}
