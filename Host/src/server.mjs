@@ -4,6 +4,9 @@ const HID = require('node-hid'),
       {extname, join, resolve} = require('path'),
       {createSecureServer} = require('http2');
 
+process.on("uncaughtException", e => console.error(e));
+process.on("unhandledRejection", reason => console.error(reason));
+
 function loadConfig(dir) {
     if(dir === undefined)
         dir = process.env.CONFIGURATION_DIRECTORY || join(__dirname, '..', 'config');
