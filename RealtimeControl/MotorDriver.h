@@ -17,13 +17,13 @@ struct StepperMotorDriver {
     bool direction[dimensions];
     float stepSize[dimensions], stepAccumulator;
     int32_t current[dimensions];
-    uint8_t enablePin[dimensions],
+    uint8_t disablePin[dimensions],
             directionPin[dimensions],
             stepPin[dimensions];
 
     void setup() {
         for(uint8_t i = 0; i < dimensions; ++i) {
-            pinMode(enablePin[i], OUTPUT);
+            pinMode(disablePin[i], OUTPUT);
             pinMode(directionPin[i], OUTPUT);
             pinMode(stepPin[i], OUTPUT);
         }
@@ -32,7 +32,7 @@ struct StepperMotorDriver {
 
     void setEnable(bool enabled) {
         for(uint8_t i = 0; i < dimensions; ++i)
-            digitalWrite(enablePin[i], enabled);
+            digitalWrite(disablePin[i], !enabled);
     }
 
     void setDirection(uint8_t i, bool forward) {
@@ -66,20 +66,19 @@ void AlertISR() {
 }
 
 struct SpindleMotorDriver {
-    uint8_t enablePin, turnPin, alertPin, speedPin, directionPin;
+    uint8_t disablePin, turnPin, alertPin, speedPin, directionPin;
     volatile uint32_t prevTurn, currentTurn;
     uint16_t voltage;
     float currentSpeed, targetSpeed, maximumSpeed;
 
     void setup() {
-        pinMode(enablePin, OUTPUT);
+        pinMode(disablePin, OUTPUT);
         pinMode(turnPin, INPUT);
         pinMode(alertPin, INPUT);
         pinMode(speedPin, OUTPUT);
         pinMode(directionPin, OUTPUT);
+        digitalWrite(disablePin, HIGH);
         analogWriteResolution(12);
-        attachInterrupt(digitalPinToInterrupt(turnPin), TurnISR, RISING);
-        attachInterrupt(digitalPinToInterrupt(alertPin), AlertISR, RISING);
         prevTurn = currentTurn = micros();
     }
 
@@ -87,12 +86,20 @@ struct SpindleMotorDriver {
         voltage = fmax(0.0F, fmin((fabs(targetSpeed)/maximumSpeed-0.05F)*0.84F, 1.0F))*4095;
         analogWrite(DAC0, voltage);
         digitalWrite(directionPin, targetSpeed > 0.0);
-        digitalWrite(enablePin, targetSpeed != 0.0);
+        if(targetSpeed == 0.0) {
+            digitalWrite(disablePin, HIGH);
+            detachInterrupt(digitalPinToInterrupt(turnPin));
+            detachInterrupt(digitalPinToInterrupt(alertPin));
+        } else {
+            digitalWrite(disablePin, LOW);
+            attachInterrupt(digitalPinToInterrupt(turnPin), TurnISR, RISING);
+            attachInterrupt(digitalPinToInterrupt(alertPin), AlertISR, RISING);
+        }
     }
 
     void loop() {
         currentSpeed = (currentTurn-prevTurn < 1000) ? 0.0F : 1000000.0F/(currentTurn-prevTurn);
-        prevTurn = currentTurn = lastLoopIteration;
+        // prevTurn = currentTurn = lastLoopIteration;
         // TODO: Speed control
     }
 };

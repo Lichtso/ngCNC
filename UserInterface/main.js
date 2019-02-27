@@ -1,4 +1,4 @@
-import {glMatrix, vec3, mat4} from './node_modules/gl-matrix/src/gl-matrix.js';
+import {glMatrix, vec3, mat4} from './node_modules/gl-matrix/esm/index.js';
 import {Shared, gl} from './Webgl.js';
 import {updateProjection} from './Cam.js';
 import {CoordinateSystem} from './CoordinateSystem.js';

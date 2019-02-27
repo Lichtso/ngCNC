@@ -1,4 +1,4 @@
-import {quat, vec3, mat3, mat4} from './node_modules/gl-matrix/src/gl-matrix.js';
+import {quat, vec3, mat3, mat4} from './node_modules/gl-matrix/esm/index.js';
 import {Shared, gl} from './Webgl.js';
 
 Shared.camTransform = mat4.create();

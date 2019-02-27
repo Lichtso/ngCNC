@@ -1,4 +1,4 @@
-import {vec3, mat4} from './node_modules/gl-matrix/src/gl-matrix.js';
+import {vec3, mat4} from './node_modules/gl-matrix/esm/index.js';
 import {Shared, gl, createShader, createProgram} from './Webgl.js';
 import {Arrow, program} from './Arrow.js';
 

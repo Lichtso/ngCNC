@@ -1,4 +1,4 @@
-import {vec3, mat4} from './node_modules/gl-matrix/src/gl-matrix.js';
+import {vec3, mat4} from './node_modules/gl-matrix/esm/index.js';
 import {Shared, gl, createShader, createProgram} from './Webgl.js';
 
 const program = createProgram(gl, createShader(gl, gl.VERTEX_SHADER, `
@@ -27,6 +27,7 @@ void main() {
 export class Toolpath {
     constructor(coordinateSystem) {
         this.coordinateSystem = coordinateSystem;
+        this.duration = 0;
         this.vertices = 0;
         this.arcPrecision = 0.1;
         this.selection = [];
@@ -59,8 +60,7 @@ export class Toolpath {
 
     load(commands) {
         this.commands = commands;
-        let time = 0.0,
-            prevLinearPosition = vec3.create(), // TODO: Starting position
+        let prevLinearPosition = vec3.create(), // TODO: Starting position
             prevAngularPosition = vec3.create();
         const linearPosition = vec3.create(),
               angularPosition = vec3.create(),
@@ -78,12 +78,12 @@ export class Toolpath {
         const positions = [];
         for(let i = 0; i < 3; ++i)
             positions.push(prevLinearPosition[i]);
-        positions.push(time);
+        positions.push(this.duration);
         this.vertices = 1;
         for(const command of commands) {
             if(!command.linearPosition)
                 continue;
-            command.timestamp = time;
+            command.timestamp = this.duration;
             command.duration = command.length/command.feedrate;
             switch(command.type) {
                 case 'Line': {
@@ -96,7 +96,7 @@ export class Toolpath {
                         vec3.transformMat4(linearPosition, linearPosition, transform);
                         for(let i = 0; i < 3; ++i)
                             positions.push(linearPosition[i]);
-                        positions.push(time+t*command.length/command.feedrate);
+                        positions.push(this.duration+t*command.length/command.feedrate);
                         ++this.vertices;
                     }
                 } break;
@@ -112,12 +112,12 @@ export class Toolpath {
                         vec3.transformMat4(linearPosition, linearPosition, transform);
                         for(let i = 0; i < 3; ++i)
                             positions.push(linearPosition[i]);
-                        positions.push(time+j/vertexCount*command.duration);
+                        positions.push(this.duration+j/vertexCount*command.duration);
                         ++this.vertices;
                     }
                 } break;
             }
-            time += command.duration;
+            this.duration += command.duration;
             prevLinearPosition = command.linearPosition;
             prevAngularPosition = command.angularPosition;
         }
@@ -148,9 +148,13 @@ export class Toolpath {
         gl.uniform2f(gl.getUniformLocation(program, 'selection'), selectionStart, selectionEnd);
         let timeThreshold = -1;
         if(status.commandQueueIndex >= 0) {
-            const command = this.commands[status.commandQueueIndex];
-            timeThreshold = command.timestamp+command.duration*Math.max(0.0, status.progress);
+            if(status.commandQueueIndex < this.commands.length) {
+                const command = this.commands[status.commandQueueIndex];
+                timeThreshold = command.timestamp+command.duration*Math.max(0.0, status.progress);
+            } else
+                timeThreshold = this.duration;
         }
+        document.getElementById('progress').value = (this.duration == 0.0) ? 0.0 : timeThreshold/this.duration;
         gl.uniform1f(gl.getUniformLocation(program, 'timeThreshold'), timeThreshold);
         if(Shared.continuousAnimation)
             gl.uniform1f(gl.getUniformLocation(program, 'animationOffset'), performance.now()/1000.0);

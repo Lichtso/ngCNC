@@ -1,4 +1,4 @@
-import {mat4} from './node_modules/gl-matrix/src/gl-matrix.js';
+import {mat4} from './node_modules/gl-matrix/esm/index.js';
 import {Shared, gl, createShader, createProgram} from './Webgl.js';
 
 export const program = createProgram(gl, createShader(gl, gl.VERTEX_SHADER, `
