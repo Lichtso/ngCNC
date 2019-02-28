@@ -4,8 +4,8 @@ const HID = require('node-hid'),
       {extname, join, resolve} = require('path'),
       {createSecureServer} = require('http2');
 
-process.on("uncaughtException", e => console.error(e));
-process.on("unhandledRejection", reason => console.error(reason));
+process.on('uncaughtException', e => console.error(e));
+process.on('unhandledRejection', reason => console.error(reason));
 
 function loadConfig(dir) {
     if(dir === undefined)
@@ -16,13 +16,13 @@ function loadConfig(dir) {
             'key': 'key.pem',
             'cert': 'cert.pem'
         },
-        'hid': {
-           'vid': 121,  // DragonRise TwinShock Gamepad
-           'pid': 6
-        },
+        'gamepad': {
+            'vid': 121, // DragonRise Inc.
+            'pid': 6 // TwinShock
+        }
         'serial': {
-           'path': '/dev/tty.usbmodem274',
-           'baudRate': 115200
+            'path': '/dev/tty.usbmodem274',
+            'baudRate': 115200
         }
     }
     const path = join(dir, 'config.json');
@@ -50,8 +50,11 @@ function loadConfig(dir) {
     }
     return config;
 }
-const config = loadConfig(),
-      staticContentRoot = join(__dirname, '..', '..', 'UserInterface'),
+const config = loadConfig();
+
+
+
+const staticContentRoot = join(__dirname, '..', '..', 'UserInterface'),
       server = createSecureServer(config.http),
       sockets = new Map(),
       contentTypeByExtension = {
@@ -130,39 +133,7 @@ server.on('stream', (stream, headers) => {
 server.listen(config.http.port);
 
 
-const gamepad = new HID.HID(config.hid.vid, config.hid.pid),
-      gamepadInputState = {'axes': [], 'buttons': [], 'active': false, 'feedrate': 0, 'spindleSpeed': 0};
-gamepad.on('data', function(data) {
-    gamepadInputState.active = (data[7] == 0x40);
-    if(!gamepadInputState.active)
-        return;
-    const axes = [data[0], data[1], data[3], data[4]].map(x => Math.max(-1, (x-128)/127)).concat([
-        [0, -1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1],
-        [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]
-    ][data[5]&0xF]);
-    for(let i = 0; i < axes.length; i += 2) {
-        let factor = Math.hypot(axes[i], axes[i+1]);
-        factor = (factor == 0.0) ? 0.0 : 1.0/factor;
-        axes[i] *= factor;
-        axes[i+1] *= factor;
-    }
-    const buttons = [];
-    for(let i = 4; i < 16; ++i) {
-        const byte = 5+Math.floor(i/8);
-        buttons[i-4] = (data[byte]>>(i%8))&1;
-    }
-    for(let i = 0; i < axes.length; i += 2)
-        if(gamepadInputState.axes[i] != axes[i] || gamepadInputState.axes[i+1] != axes[i+1])
-            handleGamepadAxisCross(i/2, axes[i], axes[i+1]);
-    for(let i = 0; i < buttons.length; ++i)
-        if(gamepadInputState.buttons[i] != buttons[i])
-            handleGamepadButton(i, buttons[i]);
-    gamepadInputState.axes = axes;
-    gamepadInputState.buttons = buttons;
-});
-gamepad.on('error', function(error) {
-    console.log('Gamepad: '+error);
-});
+
 function handleGamepadAxisCross(index, x, y) {
     console.log('Gamepad: Axis Cross', index, x, y);
     if(status.linearPosition && (index == 0 || index == 2)) {
@@ -204,6 +175,45 @@ function handleGamepadButton(index, pressed) {
             break;
     }
 }
+function handleGamepadReport(data) {
+    gamepadInputState.active = (data[7] == 0x40);
+    if(!gamepadInputState.active)
+        return;
+    const axes = [data[0], data[1], data[3], data[4]].map(x => Math.max(-1, (x-128)/127)).concat([
+        [0, -1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1],
+        [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]
+    ][data[5]&0xF]);
+    for(let i = 0; i < axes.length; i += 2) {
+        let factor = Math.hypot(axes[i], axes[i+1]);
+        factor = (factor == 0.0) ? 0.0 : 1.0/factor;
+        axes[i] *= factor;
+        axes[i+1] *= factor;
+    }
+    const buttons = [];
+    for(let i = 4; i < 16; ++i) {
+        const byte = 5+Math.floor(i/8);
+        buttons[i-4] = (data[byte]>>(i%8))&1;
+    }
+    for(let i = 0; i < axes.length; i += 2)
+        if(gamepadInputState.axes[i] != axes[i] || gamepadInputState.axes[i+1] != axes[i+1])
+            handleGamepadAxisCross(i/2, axes[i], axes[i+1]);
+    for(let i = 0; i < buttons.length; ++i)
+        if(gamepadInputState.buttons[i] != buttons[i])
+            handleGamepadButton(i, buttons[i]);
+    gamepadInputState.axes = axes;
+    gamepadInputState.buttons = buttons;
+}
+try {
+    const gamepad = new HID.HID(config.gamepad.vid, config.gamepad.pid),
+          gamepadInputState = {'axes': [], 'buttons': [], 'active': false, 'feedrate': 0, 'spindleSpeed': 0};
+    gamepad.on('error', function(error) {
+        console.log('Gamepad: '+error);
+    });
+    gamepad.on('data', handleGamepadReport);
+} catch(error) {
+    console.log('Gamepad: '+error);
+}
+
 
 
 let commandQueue = [];
@@ -212,9 +222,8 @@ const status = {
     'commandQueueIndex': -1,
     'workpieceOrigin': [0, 0, 0]
 };
-const serial = new serialport(config.serial.path, { 'baudRate': config.serial.baudRate });
-serial.pipe(new serialport.parsers.Readline()).on('data', (data) => {
-    console.log('From Arduino: '+data);
+function receiveFromRealtimeControl(data) {
+    console.log('From Realtime Control: '+data);
     data = data.split(' ');
     const packet = {'type': data[0], 'timestamp': parseFloat(data[1])};
     switch(data[0]) {
@@ -266,9 +275,15 @@ serial.pipe(new serialport.parsers.Readline()).on('data', (data) => {
     const packetStr = `data: ${JSON.stringify(packet)}\n\n`;
     for(const dstSocket of sockets.values())
         dstSocket.write(packetStr);
-});
-function sendToRealtimeControl(command) {
-    console.log('To Arduino: '+command);
-    serial.write(command+'\n');
+}
+function sendToRealtimeControl(data) {
+    console.log('To Realtime Control: '+data);
+    serial.write(data+'\n');
     status.readyFlag = false;
+}
+try {
+    const serial = new serialport(config.serial.path, config.serial);
+    serial.pipe(new serialport.parsers.Readline()).on('data', receiveFromRealtimeControl);
+} catch(error) {
+    console.log('Realtime Control: '+error);
 }
