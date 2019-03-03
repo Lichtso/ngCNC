@@ -19,7 +19,7 @@ function loadConfig(dir) {
         'gamepad': {
             'vid': 121, // DragonRise Inc.
             'pid': 6 // TwinShock
-        }
+        },
         'serial': {
             'path': '/dev/tty.usbmodem274',
             'baudRate': 115200
