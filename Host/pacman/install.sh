@@ -1,5 +1,5 @@
 pre_install() {
-	useradd -U -l -M -r -s /usr/bin/nologin -d /var/lib/{{name}} -c "{{description}}" ngcnc 
+	useradd -U -l -M -r -s /usr/bin/nologin -d /var/lib/{{name}} -c "{{description}}" ngcnc
 }
 
 post_install() {
@@ -15,6 +15,7 @@ pre_upgrade() {
 
 post_upgrade() {
 	systemctl daemon-reload
+	systemctl start {{name}}
 	systemctl start {{name}}.socket
 }
 
