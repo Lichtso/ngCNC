@@ -159,6 +159,11 @@ function handleGamepadButton(index, pressed) {
         case 1:
             sendToRealtimeControl(`Illumination ${(pressed) ? 'ON' : 'OFF'}`);
             break;
+        case 2:
+            if(!pressed)
+                return;
+            sendToRealtimeControl('SetOrigin');
+            break;
         case 4:
         case 6:
             if(!pressed)

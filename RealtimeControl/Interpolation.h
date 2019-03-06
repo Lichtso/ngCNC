@@ -5,8 +5,9 @@ struct LineInterpolator {
     int32_t start[AXIS_COUNT],
             end[AXIS_COUNT],
             diff[AXIS_COUNT],
-            error[AXIS_COUNT];
-    uint32_t stepsLeft, stepCount;
+            error[AXIS_COUNT],
+            stepsLeft,
+            stepCount;
     uint8_t circleAxis[2];
 
     void begin();

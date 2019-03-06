@@ -19,8 +19,8 @@ void setup() {
         limitSwitch.upperEndPin[i] = 3+i*2;
     }
     stepperMotorDriver.stepSize[2] *= -1; // Invert Z Axis
-    stepperMotorDriver.stepSize[4] = 0.0; // TODO: Angular Axis A
-    stepperMotorDriver.stepSize[5] = 0.0; // TODO: Angular Axis B
+    stepperMotorDriver.stepSize[3] = 0.0; // TODO: Angular Axis A
+    stepperMotorDriver.stepSize[4] = 0.0; // TODO: Angular Axis B
     stepperMotorDriver.setup();
     stepperMotorDriver.setEnable(true);
     limitSwitch.toolLengthSensor = 26;
@@ -57,15 +57,15 @@ bool nextToken() {
 }
 
 bool parseTarget() {
-    if(!nextToken())
-            return false;
+    if(feedrateManager.active || !nextToken())
+        return false;
     sscanf(token, "%f", &feedrateManager.length);
     if(!nextToken())
-            return false;
+        return false;
     sscanf(token, "%f", &feedrateManager.targetFeedrate);
     feedrateManager.targetFeedrate = fmax(feedrateManager.minimumFeedrate, feedrateManager.targetFeedrate);
     if(!nextToken())
-            return false;
+        return false;
     sscanf(token, "%f", &feedrateManager.endFeedrate);
     feedrateManager.endFeedrate = fmax(feedrateManager.minimumFeedrate, feedrateManager.endFeedrate);
     for(uint8_t i = 0; i < AXIS_COUNT; ++i) {
@@ -83,8 +83,6 @@ bool parseCommand() {
     if(!nextToken())
         return false;
     if(strcmp(token, "Line") == 0) {
-        if(feedrateManager.active)
-            return false;
         if(!parseTarget())
             return false;
         lineInterpolator.circleAxis[0] = -1;
@@ -92,8 +90,6 @@ bool parseCommand() {
         lineInterpolator.begin();
         feedrateManager.enterSegment();
     } else if(strcmp(token, "Helix") == 0) {
-        if(feedrateManager.active)
-            return false;
         if(!parseTarget())
             return false;
         int32_t center[3];
@@ -138,6 +134,11 @@ bool parseCommand() {
         circleInterpolator.center[1] = center[lineInterpolator.circleAxis[1]];
         circleInterpolator.begin();
         feedrateManager.enterSegment();
+    } else if(strcmp(token, "SetOrigin") == 0) {
+        if(feedrateManager.active)
+            return false;
+        for(uint8_t i = 0; i < AXIS_COUNT; ++i)
+            stepperMotorDriver.current[i] = 0;
     } else if(strcmp(token, "SoftStop") == 0)
         feedrateManager.targetFeedrate = feedrateManager.endFeedrate = 0.0F;
     else if(strcmp(token, "HardStop") == 0)
