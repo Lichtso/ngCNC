@@ -29,7 +29,8 @@
       }
     },
     "depends": {
-      "systemd": ">=241.0"
+      "systemd": ">=241.0",
+      "bossac": "1.3"
     }
   },
   "repository": {
