@@ -21,7 +21,7 @@ function loadConfig(dir) {
             'pid': 6 // TwinShock
         },
         'serial': {
-            'path': '/dev/tty.usbmodem274',
+            'path': '/dev/ttyACM0',
             'baudRate': 115200
         }
     }
@@ -208,9 +208,9 @@ function handleGamepadReport(data) {
     gamepadInputState.axes = axes;
     gamepadInputState.buttons = buttons;
 }
+const gamepadInputState = {'axes': [], 'buttons': [], 'active': false, 'feedrate': 0, 'spindleSpeed': 0};
 try {
-    const gamepad = new HID.HID(config.gamepad.vid, config.gamepad.pid),
-          gamepadInputState = {'axes': [], 'buttons': [], 'active': false, 'feedrate': 0, 'spindleSpeed': 0};
+    const gamepad = new HID.HID(config.gamepad.vid, config.gamepad.pid);
     gamepad.on('error', function(error) {
         console.log('Gamepad: '+error);
     });
@@ -286,8 +286,8 @@ function sendToRealtimeControl(data) {
     serial.write(data+'\n');
     status.readyFlag = false;
 }
+const serial = new serialport(config.serial.path, config.serial);
 try {
-    const serial = new serialport(config.serial.path, config.serial);
     serial.pipe(new serialport.parsers.Readline()).on('data', receiveFromRealtimeControl);
 } catch(error) {
     console.log('Realtime Control: '+error);
