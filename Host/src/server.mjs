@@ -2,7 +2,8 @@ const HID = require('node-hid'),
       serialport = require('serialport'),
       fs = require('fs'),
       {extname, join, resolve} = require('path'),
-      {createSecureServer} = require('http2');
+      {createSecureServer} = require('http2'),
+      {execFile} = require('child_process');
 
 process.on('uncaughtException', e => console.error(e));
 process.on('unhandledRejection', reason => console.error(reason));
@@ -291,4 +292,24 @@ try {
     serial.pipe(new serialport.parsers.Readline()).on('data', receiveFromRealtimeControl);
 } catch(error) {
     console.log('Realtime Control: '+error);
+}
+
+
+function uploadRealtimeFirmware(firmwareFileName, cb = (error) => {}) {
+  execFile(
+    "stty",
+    ["-F", config.serial.path, "ospeed", "1200"],
+    (error, stdout, stderr) => {
+      if(error) { cb(error, stdout, stderr); return; }
+
+      execFile(
+        "bossac",
+        ["-i", "-U", "true", "-e", "-w", "-v", "-b", firmwareFileName, "-R"],
+        (error, stdout, stderr) => {
+          if(error) { cb(error, stdout, stderr); return; }
+          cb(undefined, stdout, stderr);
+        }
+      );
+    }
+  );
 }
