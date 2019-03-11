@@ -47,7 +47,14 @@ function loadConfig(dir) {
         config.http.key = fs.readFileSync(resolve(dir, config.http.key));
         config.http.cert = fs.readFileSync(resolve(dir, config.http.cert));
     } catch(e) {
-
+        execFile(
+            'openssl',
+            ['req', '-x509', '-newkey', 'rsa:4096', '-keyout', resolve(dir, config.http.key), '-out', resolve(dir, config.http.cert), '-subj', '/CN=localhost', '-nodes'],
+            (error, stdout, stderr) => {
+                if(error)
+                    console.log('HTTPS Certificate Generator: ', error, stdout, stderr);
+            }
+        );
     }
     return config;
 }
@@ -222,7 +229,7 @@ try {
 
 
 
-let commandQueue = [];
+let serial, commandQueue = [];
 const status = {
     'readyFlag': true,
     'commandQueueIndex': -1,
@@ -287,29 +294,38 @@ function sendToRealtimeControl(data) {
     serial.write(data+'\n');
     status.readyFlag = false;
 }
-const serial = new serialport(config.serial.path, config.serial);
-try {
-    serial.pipe(new serialport.parsers.Readline()).on('data', receiveFromRealtimeControl);
-} catch(error) {
-    console.log('Realtime Control: '+error);
-}
-
-
-function uploadRealtimeFirmware(firmwareFileName, cb = (error) => {}) {
-  execFile(
-    "stty",
-    ["-F", config.serial.path, "ospeed", "1200"],
-    (error, stdout, stderr) => {
-      if(error) { cb(error, stdout, stderr); return; }
-
-      execFile(
-        "bossac",
-        ["-i", "-U", "true", "-e", "-w", "-v", "-b", firmwareFileName, "-R"],
-        (error, stdout, stderr) => {
-          if(error) { cb(error, stdout, stderr); return; }
-          cb(undefined, stdout, stderr);
-        }
-      );
+function openSerial() {
+    try {
+        serial = new serialport(config.serial.path, config.serial);
+        serial.pipe(new serialport.parsers.Readline()).on('data', receiveFromRealtimeControl);
+    } catch(error) {
+        console.log('Realtime Control: '+error);
     }
-  );
+}
+openSerial();
+function updateRealtimeControlFirmware(firmwarePath) {
+    // TODO: Try using serial.update({'baudRate': 1200}); instead of 'stty -F path ospeed 1200'
+    serial.close(error => {
+        execFile(
+            'stty',
+            ['-F', config.serial.path, 'ospeed', '1200'],
+            (error, stdout, stderr) => {
+                if(error) {
+                    console.log('Realtime Control Firmware Update: ', error, stdout, stderr);
+                    return;
+                }
+                execFile(
+                    'bossac',
+                    ['-i', '-U', 'true', '-e', '-w', '-v', '-b', firmwarePath, '-R'],
+                    (error, stdout, stderr) => {
+                        if(error) {
+                            console.log('Realtime Control Firmware Update: ', error, stdout, stderr);
+                            return;
+                        }
+                        openSerial();
+                    }
+                );
+            }
+        );
+    });
 }
