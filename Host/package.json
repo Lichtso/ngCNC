@@ -6,7 +6,7 @@
     "package": "npm-pkgbuild --npm-dist --npm-modules -t /data/binaries/arch-linux/packages/{{arch}} pkgbuild pacman makepkg"
   },
   "devDependencies": {
-    "npm-pkgbuild": "^5.1.7"
+    "npm-pkgbuild": "^5.1.10"
   },
   "dependencies": {
     "gl-matrix": "^3.0.0",
