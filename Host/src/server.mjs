@@ -34,9 +34,7 @@ function loadConfig(dir) {
                 case 'number':
                     return b;
                 case 'object':
-                    Object.keys(b).forEach(k => {
-                        a[k] = merge(a[k], b[k]);
-                    });
+                    Object.keys(b).forEach(k => a[k] = merge(a[k], b[k]));
             }
             return a;
         }
@@ -89,9 +87,7 @@ server.on('stream', (stream, headers) => {
             return;
         }
         stream.data = [];
-        stream.on('data', (data) => {
-            stream.data.push(data);
-        });
+        stream.on('data', data => stream.data.push(data));
         stream.on('end', () => {
             stream.respond({':status': 200});
             stream.end();
@@ -112,9 +108,7 @@ server.on('stream', (stream, headers) => {
             stream.respond({':status': 200, 'content-type': 'text/event-stream', 'Cache-Control': 'no-cache'});
             stream.write(`event: uplink\ndata: /socket/${stream.id}\n\n`);
             stream.write(`data: ${JSON.stringify({'type': 'CommandQueue', 'commands': commandQueue})}\n\n`);
-            stream.on('close', () => {
-                sockets.delete(stream.id);
-            });
+            stream.on('close', () => sockets.delete(stream.id));
             sockets.set(stream.id, stream);
             return;
         case '/':
