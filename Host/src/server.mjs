@@ -153,30 +153,31 @@ function handleGamepadAxisCross(index, x, y) {
     }
 }
 function handleGamepadButton(index, pressed) {
-    console.log('Gamepad: Button', index, pressed);
+    if(!pressed)
+        return;
+    console.log('Gamepad: Button Pressed', index);
     switch(index) {
         case 0:
-            sendToRealtimeControl(`Coolant ${(pressed) ? 'ON' : 'OFF'}`);
+            gamepadInputState.coolant = !gamepadInputState.coolant;
+            sendToRealtimeControl(`Coolant ${(gamepadInputState.coolant) ? 'ON' : 'OFF'}`);
             break;
         case 1:
-            sendToRealtimeControl(`Illumination ${(pressed) ? 'ON' : 'OFF'}`);
+            gamepadInputState.illumination = !gamepadInputState.illumination;
+            sendToRealtimeControl(`Illumination ${(gamepadInputState.illumination) ? 'ON' : 'OFF'}`);
             break;
         case 2:
-            if(!pressed)
-                return;
             sendToRealtimeControl('SetOrigin');
+            break;
+        case 9:
+            status.paused = !status.paused;
             break;
         case 4:
         case 6:
-            if(!pressed)
-                return;
             gamepadInputState.feedrate += (index == 6 ? -1 : 1);
             gamepadInputState.feedrate = Math.min(Math.max(0, gamepadInputState.feedrate), 5);
             break;
         case 5:
         case 7:
-            if(!pressed)
-                return;
             gamepadInputState.spindleSpeed += (index == 7) ? -10 : 10;
             sendToRealtimeControl(`SpindleSpeed ${gamepadInputState.spindleSpeed}`);
             break;
@@ -210,7 +211,7 @@ function handleGamepadReport(data) {
     gamepadInputState.axes = axes;
     gamepadInputState.buttons = buttons;
 }
-const gamepadInputState = {'axes': [], 'buttons': [], 'active': false, 'feedrate': 0, 'spindleSpeed': 0};
+const gamepadInputState = {'axes': [], 'buttons': [], 'active': false, 'coolant': false, 'illumination': false, 'feedrate': 0, 'spindleSpeed': 0};
 try {
     const gamepad = new HID.HID(config.gamepad.vid, config.gamepad.pid);
     gamepad.on('error', function(error) {
@@ -225,6 +226,7 @@ try {
 
 let serial, commandQueue = [];
 const status = {
+    'paused': true,
     'readyFlag': true,
     'commandQueueIndex': -1,
     'workpieceOrigin': [0, 0, 0]
@@ -249,14 +251,16 @@ function receiveFromRealtimeControl(data) {
             break;
         case 'Error':
             packet.message = data.slice(2).join(' ');
-            status.commandQueueIndex = -1;
-            commandQueue = [];
+            status.paused = true;
             break;
     }
-    if(status.readyFlag && status.progress == -1.0 && commandQueue.length > 0 && ++status.commandQueueIndex < commandQueue.length) {
+    if(!status.paused && status.readyFlag && status.progress == -1.0 && commandQueue.length > 0 && ++status.commandQueueIndex < commandQueue.length) {
         const command = commandQueue[status.commandQueueIndex];
         let response;
         switch(command.type) {
+            case 'Pause':
+                status.paused = true;
+                break;
             case 'SoftStop':
             case 'HardStop':
                 response = command.type;
