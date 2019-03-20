@@ -3,10 +3,10 @@
   "version": "0.0.0-semantic-release",
   "description": "ngCNC web app host",
   "scripts": {
-    "package": "npm-pkgbuild --npm-dist --npm-modules -t /data/binaries/arch-linux/packages/{{arch}} pkgbuild pacman makepkg"
+    "package": "npm-pkgbuild --npm-dist --npm-modules pkgbuild pacman makepkg"
   },
   "devDependencies": {
-    "npm-pkgbuild": "^5.1.10"
+    "npm-pkgbuild": "^5.2.1"
   },
   "dependencies": {
     "gl-matrix": "^3.0.0",
