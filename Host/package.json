@@ -6,7 +6,7 @@
     "package": "npm-pkgbuild --npm-dist --npm-modules pkgbuild pacman makepkg"
   },
   "devDependencies": {
-    "npm-pkgbuild": "^5.2.1"
+    "npm-pkgbuild": "^5.2.2"
   },
   "dependencies": {
     "gl-matrix": "^3.0.0",
