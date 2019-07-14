@@ -1,5 +1,5 @@
 [Socket]
-ListenStream=/run/{{name}}/socket
+ListenStream={{socket}}
 MaxConnections=4
 
 [Install]

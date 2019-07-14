@@ -7,7 +7,7 @@
   },
   "devDependencies": {
     "@semantic-release/exec": "^3.3.5",
-    "npm-pkgbuild": "^6.5.3",
+    "npm-pkgbuild": "^6.6.1",
     "semantic-release": "^15.13.18"
   },
   "dependencies": {
@@ -16,7 +16,7 @@
     "serialport": "^7.1.1"
   },
   "engines": {
-    "node": ">=10.15.3"
+    "node": ">=10.16.0"
   },
   "release": {
     "plugins": [
@@ -29,6 +29,9 @@
         }
       ]
     ]
+  },
+  "config": {
+    "socket" : "/run/${name}/socket"
   },
   "pacman": {
     "arch": [
